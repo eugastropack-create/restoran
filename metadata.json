@@ -1,0 +1,6 @@
+{
+  "name": "StaffSync - Restaurant Employee Scheduler",
+  "description": "Workforce management system for small restaurants with role-based scheduling, employee availability tracking, rule-based automatic shift generator, and PDF export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
