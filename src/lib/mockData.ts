@@ -7,7 +7,7 @@ const currentMonday = startOfWeek(today, { weekStartsOn: 1 });
 export const INITIAL_RESTAURANTS: Restaurant[] = [
   {
     id: 'rest-1',
-    name: 'Bistro Bella Italian Kitchen',
+    name: 'Restoran 1',
     address: '742 Evergreen Terrace, Downtown',
     phone: '(555) 382-9100',
     managerName: 'Sarah Jenkins',
@@ -24,7 +24,7 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
   },
   {
     id: 'rest-2',
-    name: 'Trattoria Milano Gourmet',
+    name: 'Restoran 2',
     address: '128 Grand Avenue, Westside',
     phone: '(555) 948-2200',
     managerName: 'Sarah Jenkins',
@@ -488,7 +488,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     color: '#f59e0b',
   },
 
-  // Shifts for Restoran 2 (Trattoria Milano Gourmet) - Demonstrating Shared Staff
+  // Shifts for Restoran 2 - Demonstrating Shared Staff
   {
     id: 'shift-201',
     restaurantId: 'rest-2',
@@ -499,7 +499,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-2', // Shared Chef Marco Rossi working evening at Restoran 2!
     isPublished: true,
     color: '#dc2626',
-    notes: 'Trattoria Milano evening dinner shift',
+    notes: 'Restoran 2 akşam vardiyası',
   },
   {
     id: 'shift-202',
@@ -511,7 +511,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-3', // Shared Cashier Elena Rostova at Restoran 2
     isPublished: true,
     color: '#d97706',
-    notes: 'Trattoria Milano mid-day shift',
+    notes: 'Restoran 2 gündüz vardiyası',
   },
   {
     id: 'shift-203',
@@ -523,7 +523,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-1', // Shared Waiter Alex Rivers
     isPublished: true,
     color: '#059669',
-    notes: 'Trattoria Milano Friday peak hours',
+    notes: 'Restoran 2 Cuma yoğun saatler',
   },
   {
     id: 'shift-204',
@@ -535,7 +535,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-5', // Shared Kitchen Staff Maria Santos
     isPublished: true,
     color: '#7c3aed',
-    notes: 'Trattoria Milano Saturday prep & service',
+    notes: 'Restoran 2 Cumartesi hazırlık & servis',
   },
 ];
 
@@ -555,7 +555,7 @@ export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
       Friday: 'rest-2',
       Saturday: 'rest-2',
     },
-    reason: 'Ortak çalışan: Hafta başında Bistro Bella (Restoran 1), Cuma-Cumartesi Trattoria Milano (Restoran 2) şubesinde çalışabilirim.',
+    reason: 'Ortak çalışan: Hafta başında Restoran 1, Cuma-Cumartesi Restoran 2 şubesinde çalışabilirim.',
     status: 'Pending',
     createdAt: new Date().toISOString(),
   },
@@ -573,7 +573,7 @@ export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
       Wednesday: 'rest-2',
       Friday: 'rest-2',
     },
-    reason: 'Müsaitlik güncellemesi: Çarşamba ve Cuma günleri Trattoria Milano şubesinde kasa/barista nöbeti tercih ediyorum.',
+    reason: 'Müsaitlik güncellemesi: Çarşamba ve Cuma günleri Restoran 2 şubesinde kasa/barista nöbeti tercih ediyorum.',
     status: 'Approved',
     createdAt: new Date().toISOString(),
   },

@@ -72,7 +72,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
     setName('');
     setEmail('');
     setPhone('');
-    setPosition('Waiter');
+    setPosition('Çalışan');
     setEmploymentType('Full-time');
     setMaxWeeklyHours(40);
     setHourlyRate(18.5);
@@ -151,20 +151,20 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-600" />
-            <span>Employee Staff Management</span>
+            <span>Mitarbeiterverwaltung</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Manage worker profiles, maximum working hours, hourly rates, and weekly availability.
+            Verwalten Sie Mitarbeiterprofile, maximale Arbeitsstunden, Stundensätze und wöchentliche Verfügbarkeiten.
           </p>
         </div>
 
         <button
           id="btn-add-employee-main"
           onClick={handleOpenAddModal}
-          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-sm transition-colors"
+          className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2 rounded-lg shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Employee Profile</span>
+          <span>Mitarbeiter hinzufügen</span>
         </button>
       </div>
 
@@ -174,7 +174,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
-            placeholder="Search employee by name, email..."
+            placeholder="Mitarbeiter suchen nach Name, E-Mail..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
@@ -182,13 +182,13 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-500 font-medium whitespace-nowrap">Filter Position:</span>
+          <span className="text-xs text-slate-500 font-medium whitespace-nowrap">Position filtern:</span>
           <select
             value={selectedPositionFilter}
             onChange={(e) => setSelectedPositionFilter(e.target.value)}
             className="bg-white border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500"
           >
-            <option value="ALL">All Positions</option>
+            <option value="ALL">Alle Positionen</option>
             {POSITIONS.map((pos) => (
               <option key={pos} value={pos}>
                 {pos}
@@ -218,7 +218,9 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                       <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded font-semibold">
                         {emp.position}
                       </span>
-                      <span className="text-[11px] text-slate-500">{emp.employmentType}</span>
+                      <span className="text-[11px] text-slate-500">
+                        {emp.employmentType === 'Full-time' ? 'Vollzeit' : 'Teilzeit'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -226,15 +228,15 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleOpenEditModal(emp)}
-                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                    title="Edit Profile"
+                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors cursor-pointer"
+                    title="Profil bearbeiten"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onDeleteEmployee(emp.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors"
-                    title="Delete Employee"
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors cursor-pointer"
+                    title="Mitarbeiter löschen"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -253,10 +255,10 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 </div>
                 <div className="flex items-center justify-between text-slate-800 font-semibold pt-1">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-blue-600" /> Max: {emp.maxWeeklyHours}h/wk
+                    <Clock className="w-3.5 h-3.5 text-blue-600" /> Max: {emp.maxWeeklyHours} Std./Woche
                   </span>
                   <span className="flex items-center gap-1 text-emerald-700 font-bold">
-                    <DollarSign className="w-3.5 h-3.5" /> ${emp.hourlyRate}/hr
+                    €{emp.hourlyRate}/Std.
                   </span>
                 </div>
               </div>
@@ -264,21 +266,32 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
               {/* Available vs Unavailable Days */}
               <div className="space-y-1 pt-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Unavailable Days:
+                  Nicht verfügbare Tage:
                 </span>
                 <div className="flex flex-wrap gap-1">
                   {emp.unavailableDays && emp.unavailableDays.length > 0 ? (
-                    emp.unavailableDays.map((day) => (
-                      <span
-                        key={day}
-                        className="text-[10px] bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded font-medium"
-                      >
-                        {day}
-                      </span>
-                    ))
+                    emp.unavailableDays.map((day) => {
+                      const dayMap: Record<string, string> = {
+                        Monday: 'Montag',
+                        Tuesday: 'Dienstag',
+                        Wednesday: 'Mittwoch',
+                        Thursday: 'Donnerstag',
+                        Friday: 'Freitag',
+                        Saturday: 'Samstag',
+                        Sunday: 'Sonntag',
+                      };
+                      return (
+                        <span
+                          key={day}
+                          className="text-[10px] bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded font-medium"
+                        >
+                          {dayMap[day] || day}
+                        </span>
+                      );
+                    })
                   ) : (
                     <span className="text-[10px] text-emerald-600 font-medium">
-                      ✓ Available All Days
+                      ✓ An allen Tagen verfügbar
                     </span>
                   )}
                 </div>
@@ -294,11 +307,11 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
           <div className="bg-white rounded-xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden">
             <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
               <h3 className="font-bold text-base">
-                {editingEmployee ? 'Edit Employee Profile' : 'Add New Employee'}
+                {editingEmployee ? 'Mitarbeiterprofil bearbeiten' : 'Neuen Mitarbeiter hinzufügen'}
               </h3>
               <button
                 onClick={() => setIsAddOpen(false)}
-                className="p-1 text-slate-400 hover:text-white"
+                className="p-1 text-slate-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -307,11 +320,11 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
             <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Full Name</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Vollständiger Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Alex Rivers"
+                    placeholder="z.B. Alex Rivers"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
@@ -319,11 +332,11 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Email Address</label>
+                  <label className="block font-semibold text-slate-700 mb-1">E-Mail-Adresse</label>
                   <input
                     type="email"
                     required
-                    placeholder="alex@restaurant.com"
+                    placeholder="alex@restaurant.de"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
@@ -333,11 +346,11 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Telefonnummer</label>
                   <input
                     type="text"
                     required
-                    placeholder="(555) 000-0000"
+                    placeholder="+49 151 12345678"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
@@ -345,7 +358,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Primary Position</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Hauptposition</label>
                   <select
                     value={position}
                     onChange={(e) => setPosition(e.target.value as Position)}
@@ -362,19 +375,19 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Employment</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Anstellung</label>
                   <select
                     value={employmentType}
                     onChange={(e) => setEmploymentType(e.target.value as EmploymentType)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2 focus:outline-none focus:border-blue-500"
                   >
-                    <option value="Full-time">Full-time</option>
-                    <option value="Part-time">Part-time</option>
+                    <option value="Full-time">Vollzeit</option>
+                    <option value="Part-time">Teilzeit</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Max Hrs/Wk</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Max Std./Woche</label>
                   <input
                     type="number"
                     min={5}
@@ -386,7 +399,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Hourly Rate ($)</label>
+                  <label className="block font-semibold text-slate-700 mb-1">Stundensatz (€)</label>
                   <input
                     type="number"
                     step="0.5"
@@ -401,25 +414,34 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
               {/* Weekly Day Availability Selector */}
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Weekly Day Availability (Click to toggle Unavailable)
+                  Wöchentliche Verfügbarkeit (Klicken zum Umschalten)
                 </label>
                 <div className="grid grid-cols-7 gap-1">
                   {DAYS_OF_WEEK.map((day) => {
                     const isUnavail = unavailableDays.includes(day);
+                    const dayLabels: Record<string, string> = {
+                      Monday: 'Mo',
+                      Tuesday: 'Di',
+                      Wednesday: 'Mi',
+                      Thursday: 'Do',
+                      Friday: 'Fr',
+                      Saturday: 'Sa',
+                      Sunday: 'So',
+                    };
                     return (
                       <button
                         key={day}
                         type="button"
                         onClick={() => toggleDayAvailability(day)}
-                        className={`py-2 rounded-lg text-[10px] font-bold border text-center transition-all ${
+                        className={`py-2 rounded-lg text-[10px] font-bold border text-center transition-all cursor-pointer ${
                           isUnavail
                             ? 'bg-rose-50 text-rose-700 border-rose-300'
                             : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                         }`}
                       >
-                        {day.substring(0, 3)}
+                        {dayLabels[day] || day.substring(0, 2)}
                         <span className="block text-[9px] font-normal">
-                          {isUnavail ? 'Off' : 'Available'}
+                          {isUnavail ? 'Frei' : 'Verfügbar'}
                         </span>
                       </button>
                     );
@@ -431,15 +453,15 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="px-4 py-2 rounded-lg text-slate-600 font-semibold hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-slate-600 font-semibold hover:bg-slate-100 cursor-pointer"
                 >
-                  Cancel
+                  Abbrechen
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm"
+                  className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm cursor-pointer"
                 >
-                  Save Profile
+                  Profil speichern
                 </button>
               </div>
             </form>

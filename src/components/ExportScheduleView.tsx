@@ -81,8 +81,8 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
 
   // Locations to display as Standort rows
   const locations = [
-    { id: 'rest-1', name: 'Ottensen', fullName: 'Bistro Bella (Ottensen)' },
-    { id: 'rest-2', name: 'Altona', fullName: 'Trattoria Milano (Altona)' },
+    { id: 'rest-1', name: 'Restoran 1', fullName: 'Restoran 1' },
+    { id: 'rest-2', name: 'Restoran 2', fullName: 'Restoran 2' },
   ];
 
   // Day Header Color Palette matching the photo exact colors
@@ -105,10 +105,10 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
         <div>
           <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <Printer className="w-5 h-5 text-blue-600" />
-            <span>Dienstplan / Vardiya Planı Yazdır & PDF Aktar</span>
+            <span>Dienstplan drucken & als PDF exportieren</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Görseldeki orijinal <strong className="text-slate-700">MITARBEITER-DIENSTPLAN (Standort Matrisi)</strong> formatında 1 veya 3 haftalık vardiya çizelgesi oluşturun.
+            Erstellen Sie den <strong className="text-slate-700">MITARBEITER-DIENSTPLAN (Standort-Matrix)</strong> im 1- oder 3-Wochen-Format.
           </p>
         </div>
 
@@ -117,25 +117,25 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
           <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 text-xs font-semibold">
             <button
               onClick={() => setExportFormat('STANDORT_MATRIX')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 exportFormat === 'STANDORT_MATRIX'
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
-              <span>Standort Planı (Resimdeki Format)</span>
+              <span>Standort-Matrix</span>
             </button>
             <button
               onClick={() => setExportFormat('EMPLOYEE_TABLE')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 exportFormat === 'EMPLOYEE_TABLE'
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Çalışan Bazlı Liste</span>
+              <span>Mitarbeiter-Liste</span>
             </button>
           </div>
 
@@ -144,19 +144,19 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
             <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 text-xs font-semibold">
               <button
                 onClick={() => setWeekCount(1)}
-                className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                   weekCount === 1 ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                1 Haftalık
+                1 Woche
               </button>
               <button
                 onClick={() => setWeekCount(3)}
-                className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
                   weekCount === 3 ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                3 Haftalık Matrix
+                3-Wochen-Matrix
               </button>
             </div>
           )}
@@ -165,8 +165,8 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
           <div className="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 text-xs font-semibold">
             <button
               onClick={() => setCurrentWeekStart(subDays(currentWeekStart, 7 * weekCount))}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700"
-              title="Önceki Dönem"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 cursor-pointer"
+              title="Vorheriger Zeitraum"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -175,8 +175,8 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
             </span>
             <button
               onClick={() => setCurrentWeekStart(addDays(currentWeekStart, 7 * weekCount))}
-              className="p-1.5 hover:bg-white rounded-lg text-slate-700"
-              title="Sonraki Dönem"
+              className="p-1.5 hover:bg-white rounded-lg text-slate-700 cursor-pointer"
+              title="Nächster Zeitraum"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -187,7 +187,7 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" />
-            <span>Yazdır</span>
+            <span>Drucken</span>
           </button>
 
           <button
@@ -196,7 +196,7 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
             className="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-colors disabled:opacity-50 cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>{isExportingPdf ? 'PDF Hazırlanıyor...' : 'PDF İndir'}</span>
+            <span>{isExportingPdf ? 'PDF wird erstellt...' : 'PDF herunterladen'}</span>
           </button>
         </div>
       </div>
@@ -315,15 +315,15 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
             <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div>
                 <h1 className="text-2xl font-black text-slate-900">{restaurant?.name || 'StaffSync Pro'}</h1>
-                <p className="text-xs text-slate-500">Ortak Çalışan Havuzu • Haftalık Vardiya Listesi</p>
+                <p className="text-xs text-slate-500">Mitarbeiter-Pool • Wöchentliche Schichtliste</p>
               </div>
 
               <div className="text-right">
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block">
-                  Resmi Vardiya Listesi
+                  Offizieller Dienstplan
                 </span>
                 <div className="text-sm font-bold text-slate-900 mt-0.5">
-                  Hafta: {format(currentWeekStart, 'dd MMMM yyyy')}
+                  Woche vom: {format(currentWeekStart, 'dd. MMMM yyyy')}
                 </div>
               </div>
             </div>
@@ -332,14 +332,27 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
               <table className="w-full border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100 border border-slate-300 font-bold text-slate-800">
-                    <th className="p-2.5 text-left border border-slate-300 w-40">Çalışan</th>
-                    <th className="p-2.5 text-left border border-slate-300 w-24">Pozisyon</th>
-                    {weeks[0].days.map((d) => (
-                      <th key={d.toISOString()} className="p-2.5 text-center border border-slate-300">
-                        <div>{format(d, 'EEEE')}</div>
-                        <div className="text-[10px] font-normal text-slate-500">{format(d, 'd MMM')}</div>
-                      </th>
-                    ))}
+                    <th className="p-2.5 text-left border border-slate-300 w-40">Mitarbeiter</th>
+                    <th className="p-2.5 text-left border border-slate-300 w-24">Position</th>
+                    {weeks[0].days.map((d) => {
+                      const dayNames: Record<string, string> = {
+                        Monday: 'Montag',
+                        Tuesday: 'Dienstag',
+                        Wednesday: 'Mittwoch',
+                        Thursday: 'Donnerstag',
+                        Friday: 'Freitag',
+                        Saturday: 'Samstag',
+                        Sunday: 'Sonntag',
+                      };
+                      const dayNameStr = dayNames[format(d, 'EEEE')] || format(d, 'EEEE');
+
+                      return (
+                        <th key={d.toISOString()} className="p-2.5 text-center border border-slate-300">
+                          <div>{dayNameStr}</div>
+                          <div className="text-[10px] font-normal text-slate-500">{format(d, 'd. MMM')}</div>
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
 
@@ -348,9 +361,6 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
                     <tr key={emp.id} className="hover:bg-slate-50/50">
                       <td className="p-2.5 border border-slate-300 font-bold text-slate-900">
                         <div>{emp.name}</div>
-                        {emp.isSharedStaff && (
-                          <span className="text-[9px] text-blue-600 font-semibold block">Ortak Çalışan</span>
-                        )}
                       </td>
                       <td className="p-2.5 border border-slate-300 font-semibold text-slate-700">
                         {emp.position}
@@ -371,7 +381,7 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
                                   className="bg-blue-50 border border-blue-200 text-slate-900 p-1.5 rounded text-[11px] font-bold space-y-0.5"
                                 >
                                   <div className="text-[9px] text-blue-700 uppercase font-extrabold">
-                                    {s.restaurantId === 'rest-2' ? 'Trattoria Milano' : 'Bistro Bella'}
+                                    {s.restaurantId === 'rest-2' ? 'Restoran 2' : 'Restoran 1'}
                                   </div>
                                   <div>
                                     {s.startTime} - {s.endTime}
@@ -394,8 +404,8 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
 
         {/* Footer info */}
         <div className="flex items-center justify-between text-slate-500 text-[11px] pt-4 border-t border-slate-200">
-          <span>StaffSync Pro Workforce Optimization • 2 Restoran Ortak Vardiya Yönetimi</span>
-          <span>Yönetici İmza: _______________________</span>
+          <span>StaffSync Pro Dienstplanverwaltung • 2 Standorte</span>
+          <span>Unterschrift Betriebsleitung: _______________________</span>
         </div>
       </div>
     </div>

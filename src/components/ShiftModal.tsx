@@ -16,6 +16,16 @@ interface ShiftModalProps {
 
 const POSITIONS: Position[] = ['Waiter', 'Chef', 'Cashier', 'Barista', 'Kitchen staff'];
 
+const GERMAN_DAYS: Record<DayOfWeek, string> = {
+  Monday: 'Montag',
+  Tuesday: 'Dienstag',
+  Wednesday: 'Mittwoch',
+  Thursday: 'Donnerstag',
+  Friday: 'Freitag',
+  Saturday: 'Samstag',
+  Sunday: 'Sonntag',
+};
+
 export const ShiftModal: React.FC<ShiftModalProps> = ({
   isOpen,
   onClose,
@@ -45,7 +55,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
       setDate(defaultDate || new Date().toISOString().split('T')[0]);
       setStartTime('09:00');
       setEndTime('17:00');
-      setPosition(defaultPosition || 'Waiter');
+      setPosition(defaultPosition || 'Çalışan');
       setAssignedEmployeeId('');
       setNotes('');
     }
@@ -78,12 +88,12 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
           <div className="flex items-center gap-2">
             <CalendarIcon className="w-5 h-5 text-amber-400" />
             <h3 className="font-bold text-lg">
-              {initialShift ? 'Edit Shift Details' : 'Create New Shift'}
+              {initialShift ? 'Schichtdetails bearbeiten' : 'Neue Schicht erstellen'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -94,7 +104,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Date */}
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Shift Date</label>
+              <label className="block text-slate-700 font-semibold mb-1">Schichtdatum</label>
               <input
                 type="date"
                 required
@@ -102,16 +112,16 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500"
               />
-              <span className="text-[10px] text-slate-500 mt-1 block">Day: {selectedDayOfWeek}</span>
+              <span className="text-[10px] text-slate-500 mt-1 block">Tag: {GERMAN_DAYS[selectedDayOfWeek]}</span>
             </div>
 
             {/* Required Position */}
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Required Position</label>
+              <label className="block text-slate-700 font-semibold mb-1">Erforderliche Position</label>
               <select
                 value={position}
                 onChange={(e) => setPosition(e.target.value as Position)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500 cursor-pointer"
               >
                 {POSITIONS.map((p) => (
                   <option key={p} value={p}>
@@ -125,7 +135,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
           {/* Time Interval */}
           <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Start Time</label>
+              <label className="block text-slate-700 font-semibold mb-1">Startzeit</label>
               <input
                 type="time"
                 required
@@ -136,7 +146,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">End Time</label>
+              <label className="block text-slate-700 font-semibold mb-1">Endzeit</label>
               <input
                 type="time"
                 required
@@ -148,26 +158,26 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
 
             <div className="col-span-2 flex items-center justify-between text-slate-600 font-semibold text-[11px] pt-1">
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-amber-500" /> Total Duration:
+                <Clock className="w-3.5 h-3.5 text-amber-500" /> Gesamtdauer:
               </span>
-              <span className="text-amber-700 font-bold">{durationHours} hours</span>
+              <span className="text-amber-700 font-bold">{durationHours} Std.</span>
             </div>
           </div>
 
           {/* Assigned Employee Selector */}
           <div>
-            <label className="block text-slate-700 font-semibold mb-1">Assign Employee</label>
+            <label className="block text-slate-700 font-semibold mb-1">Mitarbeiter zuweisen</label>
             <select
               value={assignedEmployeeId}
               onChange={(e) => setAssignedEmployeeId(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500 cursor-pointer"
             >
-              <option value="">-- Unassigned (Draft Shift) --</option>
+              <option value="">-- Unbesetzt (Entwurf) --</option>
               {employees.map((emp) => {
                 const isUnavailable = emp.unavailableDays.includes(selectedDayOfWeek);
 
-                let label = `${emp.name} (Çalışan)`;
-                if (isUnavailable) label += ' ⚠️ Unavailable on ' + selectedDayOfWeek;
+                let label = `${emp.name} (${emp.position})`;
+                if (isUnavailable) label += ` ⚠️ Nicht verfügbar am ${GERMAN_DAYS[selectedDayOfWeek]}`;
 
                 return (
                   <option key={emp.id} value={emp.id}>
@@ -180,11 +190,11 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
               <div className="mt-1.5 text-[11px]">
                 {employees.find((e) => e.id === assignedEmployeeId)?.unavailableDays.includes(selectedDayOfWeek) ? (
                   <span className="text-rose-600 font-medium flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" /> Warning: {employees.find((e) => e.id === assignedEmployeeId)?.name} marked {selectedDayOfWeek} as unavailable.
+                    <AlertTriangle className="w-3 h-3" /> Warnung: {employees.find((e) => e.id === assignedEmployeeId)?.name} ist am {GERMAN_DAYS[selectedDayOfWeek]} nicht verfügbar.
                   </span>
                 ) : (
                   <span className="text-emerald-600 font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Available on {selectedDayOfWeek}
+                    <Check className="w-3 h-3" /> Verfügbar am {GERMAN_DAYS[selectedDayOfWeek]}
                   </span>
                 )}
               </div>
@@ -193,10 +203,10 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-slate-700 font-semibold mb-1">Shift Notes / Station</label>
+            <label className="block text-slate-700 font-semibold mb-1">Notizen / Bereich</label>
             <textarea
               rows={2}
-              placeholder="e.g. Patio seating, Kitchen prep, Cash register #1..."
+              placeholder="z. B. Terrassenbereich, Küchenvorbereitung, Kasse 1..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-slate-800 focus:outline-none focus:border-amber-500"
@@ -212,9 +222,9 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
                   onDeleteShift(initialShift.id);
                   onClose();
                 }}
-                className="text-rose-600 hover:text-rose-700 font-semibold text-xs px-3 py-2 rounded-xl hover:bg-rose-50 transition-colors"
+                className="text-rose-600 hover:text-rose-700 font-semibold text-xs px-3 py-2 rounded-xl hover:bg-rose-50 transition-colors cursor-pointer"
               >
-                Delete Shift
+                Schicht löschen
               </button>
             ) : (
               <div />
@@ -224,15 +234,15 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 transition-colors"
+                className="px-4 py-2 rounded-xl text-slate-600 font-semibold hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                Cancel
+                Abbrechen
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow transition-colors"
+                className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold shadow transition-colors cursor-pointer"
               >
-                Save Shift
+                Schicht speichern
               </button>
             </div>
           </div>

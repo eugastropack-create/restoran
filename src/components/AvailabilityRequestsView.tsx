@@ -33,6 +33,16 @@ const DAYS_OF_WEEK: DayOfWeek[] = [
   'Sunday',
 ];
 
+const GERMAN_DAYS: Record<DayOfWeek, string> = {
+  Monday: 'Montag',
+  Tuesday: 'Dienstag',
+  Wednesday: 'Mittwoch',
+  Thursday: 'Donnerstag',
+  Friday: 'Freitag',
+  Saturday: 'Samstag',
+  Sunday: 'Sonntag',
+};
+
 export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> = ({
   requests,
   currentUser,
@@ -43,50 +53,80 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
 }) => {
   const isManager = currentUser?.role === 'Manager';
 
-  // Employee Form State
-  const [requestedUnavailableDays, setRequestedUnavailableDays] = useState<DayOfWeek[]>([]);
-  const [preferredRestaurantId, setPreferredRestaurantId] = useState<string>('ALL');
-  const [dayRestaurantPreferences, setDayRestaurantPreferences] = useState<Partial<Record<DayOfWeek, string>>>({
-    Monday: 'rest-1',
-    Wednesday: 'rest-1',
-    Friday: 'rest-2',
-    Saturday: 'rest-2',
-  });
+  // 3-Week Availability State
+  const WEEKS = [
+    { id: '1. Woche (Diese Woche)', label: '1. Woche (Diese Woche)' },
+    { id: '2. Woche (Nächste Woche)', label: '2. Woche (Nächste Woche)' },
+    { id: '3. Woche (In 2 Wochen)', label: '3. Woche (In 2 Wochen)' },
+  ];
+
+  const [activeWeekIndex, setActiveWeekIndex] = useState<number>(0);
+
+  // Availability per week: Map weekIndex -> Record<DayOfWeek, AvailabilityType>
+  type AvailabilityType = 'Ganztägig' | 'Halbtag (Morgen)' | 'Halbtag (Abend)' | 'Frei / Nicht verfügbar';
+
+  const initialWeekAvailability = (): Record<number, Record<DayOfWeek, AvailabilityType>> => {
+    const initialDayMap: Record<DayOfWeek, AvailabilityType> = {
+      Monday: 'Ganztägig',
+      Tuesday: 'Ganztägig',
+      Wednesday: 'Ganztägig',
+      Thursday: 'Ganztägig',
+      Friday: 'Ganztägig',
+      Saturday: 'Ganztägig',
+      Sunday: 'Ganztägig',
+    };
+    return {
+      0: { ...initialDayMap },
+      1: { ...initialDayMap },
+      2: { ...initialDayMap },
+    };
+  };
+
+  const [weeklyAvailabilityMap, setWeeklyAvailabilityMap] = useState<
+    Record<number, Record<DayOfWeek, AvailabilityType>>
+  >(initialWeekAvailability);
+
   const [requestedMaxHours, setRequestedMaxHours] = useState<number>(38);
   const [reason, setReason] = useState<string>('');
   const [submittedSuccess, setSubmittedSuccess] = useState<boolean>(false);
 
   const currentEmp = employees.find((e) => e.id === currentUser?.employeeId);
 
-  const toggleDay = (day: DayOfWeek) => {
-    if (requestedUnavailableDays.includes(day)) {
-      setRequestedUnavailableDays(requestedUnavailableDays.filter((d) => d !== day));
-    } else {
-      setRequestedUnavailableDays([...requestedUnavailableDays, day]);
-    }
-  };
-
-  const setDayPreference = (day: DayOfWeek, restId: string) => {
-    setDayRestaurantPreferences((prev) => ({ ...prev, [day]: restId }));
+  const setDayAvailability = (weekIdx: number, day: DayOfWeek, type: AvailabilityType) => {
+    setWeeklyAvailabilityMap((prev) => ({
+      ...prev,
+      [weekIdx]: {
+        ...prev[weekIdx],
+        [day]: type,
+      },
+    }));
   };
 
   const handleEmployeeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentEmp) return;
 
-    const requestedAvailableDays = DAYS_OF_WEEK.filter(
-      (d) => !requestedUnavailableDays.includes(d)
-    );
+    WEEKS.forEach((w, weekIdx) => {
+      const currentWeekData = weeklyAvailabilityMap[weekIdx];
+      const selectedWeekLabel = w.label;
 
-    onRequestSubmit({
-      employeeId: currentEmp.id,
-      employeeName: `${currentEmp.name}${currentEmp.isSharedStaff ? ' (Ortak Çalışan / Shared Staff)' : ''}`,
-      requestedAvailableDays,
-      requestedUnavailableDays,
-      requestedMaxHours: Number(requestedMaxHours),
-      preferredRestaurantId,
-      dayRestaurantPreferences,
-      reason: reason || 'Müsaitlik güncellemesi: 2 restoran ortak şube çalışma günleri belirlendi.',
+      const requestedUnavailableDays = DAYS_OF_WEEK.filter(
+        (d) => currentWeekData[d] === 'Frei / Nicht verfügbar'
+      );
+      const requestedAvailableDays = DAYS_OF_WEEK.filter(
+        (d) => currentWeekData[d] !== 'Frei / Nicht verfügbar'
+      );
+
+      onRequestSubmit({
+        employeeId: currentEmp.id,
+        employeeName: `${currentEmp.name}${currentEmp.isSharedStaff ? ' (Gemeinsamer Mitarbeiter)' : ''}`,
+        selectedWeek: selectedWeekLabel,
+        requestedAvailableDays,
+        requestedUnavailableDays,
+        dayAvailabilityTypes: currentWeekData,
+        requestedMaxHours: Number(requestedMaxHours),
+        reason: reason || `Verfügbarkeitsmeldung für ${selectedWeekLabel} aktualisiert.`,
+      });
     });
 
     setSubmittedSuccess(true);
@@ -102,21 +142,21 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-blue-400" />
             <h2 className="text-xl font-bold tracking-tight">
-              Çalışan Müsaitlik Bildirimi & 2 Restoran Yönetimi
+              Mitarbeiter-Verfügbarkeit & 3-Wochen-Planung
             </h2>
           </div>
           <p className="text-xs text-slate-300 mt-1">
             {isManager
-              ? '2 restoranın ortak çalışanlarından gelen haftalık müsaitlik ve şube tercihlerini inceleyin ve onaylayın.'
-              : 'Çalışabileceğiniz günleri, saat sınırınızı ve hangi restoranda (Bistro Bella veya Trattoria Milano) müsait olduğunuzu bildirin.'}
+              ? 'Prüfen und genehmigen Sie die 3-Wochen-Verfügbarkeitsmeldungen (Ganztägig / Halbtag / Frei) der Mitarbeiter.'
+              : 'Geben Sie Ihre Verfügbarkeit (Ganztägig, Halbtags oder Frei) für die nächsten 3 Wochen an.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/80 px-3 py-2 rounded-xl text-xs">
-          <Users2 className="w-4 h-4 text-blue-400" />
+          <Calendar className="w-4 h-4 text-blue-400" />
           <div>
-            <div className="font-bold text-slate-200">Ortak Çalışan Havuzu</div>
-            <div className="text-[10px] text-blue-400 font-medium">Bistro Bella + Trattoria Milano</div>
+            <div className="font-bold text-slate-200">3-Wochen-Ansicht</div>
+            <div className="text-[10px] text-blue-400 font-medium">Flexible Schichten & Halbtag</div>
           </div>
         </div>
       </div>
@@ -128,102 +168,102 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
             <div>
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Send className="w-4 h-4 text-blue-600" />
-                <span>Yeni Müsaitlik Bildirimi Gönder</span>
+                <span>Neue Verfügbarkeitsmeldung senden</span>
               </h3>
               <p className="text-xs text-slate-500">
-                {currentEmp.name} - {currentEmp.isSharedStaff ? '2 Restoran Ortak Çalışanı' : 'Restoran Çalışanı'}
+                {currentEmp.name} - {currentEmp.isSharedStaff ? 'Gemeinsamer Mitarbeiter' : 'Restaurant-Mitarbeiter'}
               </p>
             </div>
-            {currentEmp.isSharedStaff && (
-              <span className="bg-blue-50 text-blue-700 border border-blue-200 text-[11px] px-2.5 py-1 rounded-lg font-bold">
-                Ortak Çalışan / Shared Staff
-              </span>
-            )}
           </div>
 
           {submittedSuccess && (
             <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>Müsaitlik bildiriminiz başarıyla yöneticinize iletildi!</span>
+              <span>Ihre Verfügbarkeitsmeldungen für alle 3 Wochen wurden erfolgreich an den Manager gesendet!</span>
             </div>
           )}
 
-          <form onSubmit={handleEmployeeSubmit} className="space-y-5 text-xs">
-            {/* Preferred Primary Location */}
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-              <label className="block font-bold text-slate-800">
-                Genel Şube Tercihi (General Location Preference):
-              </label>
-              <select
-                value={preferredRestaurantId}
-                onChange={(e) => setPreferredRestaurantId(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 font-semibold focus:outline-none focus:border-blue-500"
-              >
-                <option value="ALL"> Her İki Restoran Müsait (Bistro Bella + Trattoria Milano)</option>
-                <option value="rest-1">Öncelik: Bistro Bella Italian Kitchen (Restoran 1)</option>
-                <option value="rest-2">Öncelik: Trattoria Milano Gourmet (Restoran 2)</option>
-              </select>
-            </div>
+          <form onSubmit={handleEmployeeSubmit} className="space-y-6 text-xs">
+            {/* 3 Weeks Availability Stacked */}
+            <div className="space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-100 pb-2">
+                <label className="block font-bold text-slate-800 text-sm">
+                  Verfügbarkeitsstatus für 3 Wochen:
+                </label>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  Wählen Sie für jede Woche Ihre Präferenz (Ganztägig / Halbtag / Frei).
+                </span>
+              </div>
 
-            {/* Daily Availability & Location Selection */}
-            <div>
-              <label className="block font-semibold text-slate-800 mb-2">
-                Haftalık Günlük Müsaitlik ve Şube Tercihleri:
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-2.5">
-                {DAYS_OF_WEEK.map((day) => {
-                  const isUnavailable = requestedUnavailableDays.includes(day);
-                  const selectedRest = dayRestaurantPreferences[day] || 'ALL';
+              {WEEKS.map((w, weekIdx) => (
+                <div
+                  key={w.id}
+                  className="bg-slate-50/90 p-4 rounded-2xl border border-slate-200/80 space-y-3 shadow-xs"
+                >
+                  <div className="flex items-center gap-2 border-b border-slate-200/60 pb-2">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <h4 className="font-bold text-slate-900 text-xs sm:text-sm">{w.label}</h4>
+                  </div>
 
-                  return (
-                    <div
-                      key={day}
-                      className={`p-3 rounded-xl border flex flex-col justify-between space-y-2 transition-all ${
-                        isUnavailable
-                          ? 'bg-rose-50/70 border-rose-200 text-rose-800'
-                          : 'bg-slate-50 border-slate-200 text-slate-800'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold">{day}</span>
-                        <button
-                          type="button"
-                          onClick={() => toggleDay(day)}
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
-                            isUnavailable
-                              ? 'bg-rose-600 text-white'
-                              : 'bg-emerald-600 text-white'
-                          }`}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-2.5">
+                    {DAYS_OF_WEEK.map((day) => {
+                      const currentType = weeklyAvailabilityMap[weekIdx][day];
+
+                      let cardStyle = 'bg-white border-slate-200 text-slate-800';
+                      if (currentType === 'Ganztägig') {
+                        cardStyle = 'bg-emerald-50/80 border-emerald-200 text-emerald-900';
+                      } else if (currentType.includes('Halbtag')) {
+                        cardStyle = 'bg-amber-50/90 border-amber-200 text-amber-900';
+                      } else if (currentType === 'Frei / Nicht verfügbar') {
+                        cardStyle = 'bg-rose-50/80 border-rose-200 text-rose-800';
+                      }
+
+                      return (
+                        <div
+                          key={day}
+                          className={`p-3 rounded-xl border flex flex-col justify-between space-y-2.5 transition-all ${cardStyle}`}
                         >
-                          {isUnavailable ? 'İzinli' : 'Müsait'}
-                        </button>
-                      </div>
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-xs">{GERMAN_DAYS[day]}</span>
+                            <span
+                              className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
+                                currentType === 'Ganztägig'
+                                  ? 'bg-emerald-600 text-white'
+                                  : currentType.includes('Halbtag')
+                                  ? 'bg-amber-600 text-white'
+                                  : 'bg-rose-600 text-white'
+                              }`}
+                            >
+                              {currentType}
+                            </span>
+                          </div>
 
-                      {!isUnavailable && (
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-slate-500 font-medium block">Şube:</span>
+                          {/* Select options */}
                           <select
-                            value={selectedRest}
-                            onChange={(e) => setDayPreference(day, e.target.value)}
-                            className="w-full bg-white border border-slate-300 rounded text-[11px] p-1 font-medium focus:outline-none focus:border-blue-500"
+                            value={currentType}
+                            onChange={(e) =>
+                              setDayAvailability(weekIdx, day, e.target.value as AvailabilityType)
+                            }
+                            className="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-[11px] font-semibold text-slate-800 focus:outline-none focus:border-blue-500 shadow-xs"
                           >
-                            <option value="ALL">İki Şube De Olur</option>
-                            <option value="rest-1">Bistro Bella</option>
-                            <option value="rest-2">Trattoria Milano</option>
+                            <option value="Ganztägig">🟢 Ganztägig</option>
+                            <option value="Halbtag (Morgen)">🌤️ Halbtag (Morgen)</option>
+                            <option value="Halbtag (Abend)">🌙 Halbtag (Abend)</option>
+                            <option value="Frei / Nicht verfügbar">🔴 Frei / Nicht verfügbar</option>
                           </select>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Additional Inputs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Maksimum Haftalık Çalışma Saati (Max Weekly Hours):
+                  Maximale Wochenarbeitszeit (Stunden/Woche):
                 </label>
                 <input
                   type="number"
@@ -236,10 +276,10 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Açıklama / Not (Reason / Note):</label>
+                <label className="block font-semibold text-slate-700 mb-1">Hinweis / Anmerkung:</label>
                 <input
                   type="text"
-                  placeholder="Örn: Pazartesi-Çarşamba Bistro Bella'da, Cuma-Cumartesi Trattoria Milano'da akşam nöbetinde müsaitim..."
+                  placeholder="z. B. Unter der Woche bevorzugt Abendschichten..."
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-blue-500"
@@ -249,10 +289,10 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
 
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-md transition-colors cursor-pointer w-full sm:w-auto text-xs sm:text-sm"
             >
               <Send className="w-4 h-4" />
-              <span>Müsaitlik Bildirimini Gönder</span>
+              <span>Verfügbarkeitsmeldung für 3 Wochen senden</span>
             </button>
           </form>
         </div>
@@ -262,16 +302,16 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <h3 className="text-base font-bold text-slate-900">
-            {isManager ? 'Gelen Çalışan Müsaitlik Bildirimleri' : 'Gönderdiğim Müsaitlik Bildirimleri'}
+            {isManager ? 'Eingegangene Verfügbarkeitsmeldungen' : 'Meine gesendeten Verfügbarkeitsmeldungen'}
           </h3>
           <span className="text-xs text-slate-500 font-medium">
-            Toplam {requests.length} bildirim kaydı
+            Gesamt {requests.length} Einträge
           </span>
         </div>
 
         {requests.length === 0 ? (
           <div className="text-center py-10 text-slate-500 text-xs">
-            Henüz bildirilmiş bir müsaitlik talebi bulunmuyor.
+            Bisher wurden keine Verfügbarkeitsmeldungen eingereicht.
           </div>
         ) : (
           <div className="space-y-3">
@@ -280,7 +320,7 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                 key={req.id}
                 className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
-                <div className="space-y-1.5 flex-1">
+                <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-slate-900 text-sm">{req.employeeName}</span>
                     <span
@@ -292,44 +332,61 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                           : 'bg-amber-100 text-amber-800 border border-amber-300'
                       }`}
                     >
-                      {req.status === 'Approved' ? 'Onaylandı' : req.status === 'Rejected' ? 'Reddedildi' : 'Beklemede'}
+                      {req.status === 'Approved' ? 'Genehmigt' : req.status === 'Rejected' ? 'Abgelehnt' : 'Ausstehend'}
                     </span>
 
-                    <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                      <Building2 className="w-3 h-3 text-blue-500" />
-                      {req.preferredRestaurantId === 'rest-2'
-                        ? 'Trattoria Milano Tercihi'
-                        : req.preferredRestaurantId === 'rest-1'
-                        ? 'Bistro Bella Tercihi'
-                        : 'Her İki Restoran Müsait'}
-                    </span>
+                    {req.selectedWeek && (
+                      <span className="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-blue-500" />
+                        {req.selectedWeek}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="text-xs text-slate-600 space-y-1">
-                    <div>
-                      <strong>İzinli/Çalışılamayan Günler:</strong>{' '}
-                      {req.requestedUnavailableDays.length > 0 ? (
-                        <span className="text-rose-600 font-semibold">{req.requestedUnavailableDays.join(', ')}</span>
-                      ) : (
-                        <span className="text-emerald-600 font-semibold">Tüm Günler Müsait</span>
-                      )}
-                    </div>
-                    <div>
-                      <strong>Maksimum Haftalık Çalışma:</strong> {req.requestedMaxHours} saat/hafta
-                    </div>
+                  <div className="text-xs text-slate-600 space-y-1.5">
+                    {/* Day Availability Badges */}
+                    {req.dayAvailabilityTypes && Object.keys(req.dayAvailabilityTypes).length > 0 ? (
+                      <div className="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1">
+                        <strong className="block text-slate-700 font-bold text-[11px]">
+                          Tägliche Verfügbarkeitsdetails:
+                        </strong>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DAYS_OF_WEEK.map((day) => {
+                            const type = req.dayAvailabilityTypes?.[day] || 'Ganztägig';
+                            let badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                            if (type.includes('Halbtag')) {
+                              badgeStyle = 'bg-amber-50 text-amber-800 border-amber-200';
+                            } else if (type === 'Frei / Nicht verfügbar' || type === 'İzinli') {
+                              badgeStyle = 'bg-rose-50 text-rose-800 border-rose-200';
+                            }
 
-                    {req.dayRestaurantPreferences && Object.keys(req.dayRestaurantPreferences).length > 0 && (
-                      <div className="text-[11px] text-slate-600 bg-white p-2 rounded-lg border border-slate-200 mt-1">
-                        <strong className="block text-slate-700 font-bold mb-0.5">Günlük Şube Tercihleri:</strong>
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(req.dayRestaurantPreferences).map(([d, rId]) => (
-                            <span key={d} className="bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300 font-medium">
-                              {d}: {rId === 'rest-1' ? 'Bistro Bella' : rId === 'rest-2' ? 'Trattoria Milano' : 'Her İkisi'}
-                            </span>
-                          ))}
+                            return (
+                              <span
+                                key={day}
+                                className={`text-[10px] px-2 py-0.5 rounded-lg border font-semibold flex items-center gap-1 ${badgeStyle}`}
+                              >
+                                <span className="font-bold">{GERMAN_DAYS[day].slice(0, 2)}:</span> {type}
+                              </span>
+                            );
+                          })}
                         </div>
                       </div>
+                    ) : (
+                      <div>
+                        <strong>Freie Tage:</strong>{' '}
+                        {req.requestedUnavailableDays.length > 0 ? (
+                          <span className="text-rose-600 font-semibold">
+                            {req.requestedUnavailableDays.map((d) => GERMAN_DAYS[d] || d).join(', ')}
+                          </span>
+                        ) : (
+                          <span className="text-emerald-600 font-semibold">Alle Tage verfügbar</span>
+                        )}
+                      </div>
                     )}
+
+                    <div>
+                      <strong>Maximale Wochenarbeitszeit:</strong> {req.requestedMaxHours} Std./Woche
+                    </div>
 
                     {req.reason && (
                       <div className="text-slate-600 italic flex items-center gap-1 mt-1 bg-blue-50/50 p-2 rounded-lg border border-blue-100">
@@ -347,13 +404,13 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                       onClick={() => onRequestStatusUpdate(req.id, 'Approved')}
                       className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
                     >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Onayla
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Genehmigen
                     </button>
                     <button
                       onClick={() => onRequestStatusUpdate(req.id, 'Rejected')}
                       className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
                     >
-                      <XCircle className="w-3.5 h-3.5" /> Reddet
+                      <XCircle className="w-3.5 h-3.5" /> Ablehnen
                     </button>
                   </div>
                 )}

@@ -57,15 +57,15 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
               <Sparkles className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <h3 className="font-bold text-base">Rule-Based Auto Scheduler</h3>
+              <h3 className="font-bold text-base">Automatische Dienstplan-Erstellung</h3>
               <p className="text-[11px] text-slate-400 font-medium">
-                Algorithmic workforce optimization engine (No AI required)
+                Algorithmitische Dienstplan-Optimierung nach Regeln
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors"
+            className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -79,7 +79,7 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
               <div className="space-y-4">
                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
                   <label className="block text-slate-800 font-bold text-xs">
-                    Target Week Starting
+                    Zielwoche auswählen
                   </label>
                   <input
                     type="date"
@@ -88,13 +88,13 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     className="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-slate-800 font-semibold focus:outline-none focus:border-blue-500"
                   />
                   <p className="text-[11px] text-slate-500">
-                    The engine will assign active employees to all unassigned shifts for this week.
+                    Das System weist aktive Mitarbeiter den unbesetzten Schichten dieser Woche zu.
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <h4 className="font-bold text-slate-900 text-xs flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-blue-600" /> Active Scheduling Rules
+                    <ShieldCheck className="w-4 h-4 text-blue-600" /> Aktive Planungsregeln
                   </h4>
 
                   {/* Rule 1 */}
@@ -107,10 +107,10 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     />
                     <div>
                       <div className="font-bold text-slate-800">
-                        1. Respect Unavailable Days
+                        1. Abwesenheiten & Wünsche beachten
                       </div>
                       <div className="text-slate-500 text-[11px]">
-                        Strictly exclude staff who marked specific days as unavailable in their availability preferences.
+                        Schließt Mitarbeiter an ihren als abwesend markierten Tagen aus.
                       </div>
                     </div>
                   </label>
@@ -125,10 +125,10 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     />
                     <div>
                       <div className="font-bold text-slate-800">
-                        2. Respect Maximum Weekly Hours Limit
+                        2. Maximale Wochenstunden beachten
                       </div>
                       <div className="text-slate-500 text-[11px]">
-                        Never assign a shift if total weekly hours for that employee would exceed their profile max hours limit.
+                        Keine Schicht zuweisen, die die festgelegte Wochenstundenzahl überschreitet.
                       </div>
                     </div>
                   </label>
@@ -143,10 +143,10 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     />
                     <div>
                       <div className="font-bold text-slate-800">
-                        3. Balance Work Hours Between Employees
+                        3. Gleichmäßige Stundenverteilung
                       </div>
                       <div className="text-slate-500 text-[11px]">
-                        Prioritize team members with lower accumulated scheduled hours for fair work distribution.
+                        Bevorzugt Mitarbeiter mit weniger bisher eingeplanten Stunden.
                       </div>
                     </div>
                   </label>
@@ -161,10 +161,10 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     />
                     <div>
                       <div className="font-bold text-slate-800">
-                        4. Position & Role Matching
+                        4. Position & Rollenabgleich
                       </div>
                       <div className="text-slate-500 text-[11px]">
-                        Match primary position required (e.g. Waiter to Waiter shift). Prevent overlapping double-booking.
+                        Weist Schichten nur Mitarbeitern mit passender Position zu und verhindert Überschneidungen.
                       </div>
                     </div>
                   </label>
@@ -179,10 +179,10 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                     />
                     <div>
                       <div className="font-bold text-slate-800">
-                        5. Re-evaluate Draft Shifts
+                        5. Entwürfe zurücksetzen
                       </div>
                       <div className="text-slate-500 text-[11px]">
-                        Reset current un-published draft assignments before executing calculation.
+                        Setzt bisher unversehende Entwurfs-Zuweisungen vor der Berechnung zurück.
                       </div>
                     </div>
                   </label>
@@ -195,11 +195,11 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                   id="btn-run-auto-algorithm"
                   onClick={handleRun}
                   disabled={isRunning}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>
-                    {isRunning ? 'Running Optimization Engine...' : 'Run Automatic Schedule Generator'}
+                    {isRunning ? 'Dienstplan wird berechnet...' : 'Automatische Planung starten'}
                   </span>
                 </button>
               </div>
@@ -211,20 +211,20 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                 <div>
                   <h4 className="font-extrabold text-emerald-900 text-sm flex items-center gap-2">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    Automatic Scheduling Complete!
+                    Automatische Planung abgeschlossen!
                   </h4>
                   <p className="text-xs text-emerald-700 mt-1">
-                    Successfully processed {result.totalShiftsProcessed} total shifts. Assigned:{' '}
-                    <strong>{result.assignedShiftsCount}</strong> | Unfilled:{' '}
+                    Insgesamt verarbeitete Schichten: {result.totalShiftsProcessed} | Zugewiesen:{' '}
+                    <strong>{result.assignedShiftsCount}</strong> | Nicht besetzt:{' '}
                     <strong>{result.unfilledShiftsCount}</strong>
                   </p>
                 </div>
 
                 <button
                   onClick={() => setResult(null)}
-                  className="text-xs text-emerald-800 underline font-semibold"
+                  className="text-xs text-emerald-800 underline font-semibold cursor-pointer"
                 >
-                  Re-run with rules
+                  Mit Regeln neu berechnen
                 </button>
               </div>
 
@@ -232,7 +232,7 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
               <div className="space-y-2">
                 <h5 className="font-bold text-slate-800 flex items-center gap-1.5 text-xs">
                   <ListFilter className="w-4 h-4 text-amber-500" />
-                  Detailed Shift Assignment Audit Logs:
+                  Detailliertes Zuordnungsprotokoll:
                 </h5>
 
                 <div className="max-h-60 overflow-y-auto space-y-2 border border-slate-200 p-2 rounded-xl bg-slate-50">
@@ -263,7 +263,7 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
                           </span>
                         ) : (
                           <span className="text-xs font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full">
-                            ⚠️ Unfilled
+                            ⚠️ Nicht besetzt
                           </span>
                         )}
                       </div>
@@ -276,9 +276,9 @@ export const AutoSchedulerModal: React.FC<AutoSchedulerModalProps> = ({
               <div className="pt-2">
                 <button
                   onClick={onClose}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Accept & Apply Schedule</span>
+                  <span>Dienstplan übernehmen & anwenden</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

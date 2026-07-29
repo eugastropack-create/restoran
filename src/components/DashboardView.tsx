@@ -92,9 +92,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Dashboard & Schedule Overview</h1>
+          <h1 className="text-xl font-bold text-slate-900">Dashboard & Dienstplan-Übersicht</h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
-            Weekly workforce summary for {format(new Date(), 'EEEE, MMMM d, yyyy')}
+            Wöchentliche Personalübersicht für {format(new Date(), 'EEEE, d. MMMM yyyy')}
           </p>
         </div>
 
@@ -102,19 +102,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <button
             id="btn-add-shift-dash"
             onClick={onOpenAddShift}
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Shift</span>
+            <span>Schicht erstellen</span>
           </button>
 
           <button
             id="btn-auto-schedule-dash"
             onClick={onOpenAutoScheduler}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Auto-Generate Schedule</span>
+            <span>Autom. Dienstplan erstellen</span>
           </button>
         </div>
       </div>
@@ -123,17 +123,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Hours */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Hours</p>
-          <p className="text-2xl font-bold text-slate-900">{stats.totalHoursThisWeek}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Gesamte Arbeitsstunden</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.totalHoursThisWeek} Std.</p>
           <div className="mt-2 text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            <span>+8.5 hrs vs last week target</span>
+            <span>+8.5 Std. ggü. Vorwoche</span>
           </div>
         </div>
 
         {/* Card 2: Scheduled Staff */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Scheduled Staff</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Eingeteiltes Personal</p>
           <p className="text-2xl font-bold text-slate-900">
             {activeEmployeesCount} / {stats.totalEmployees}
           </p>
@@ -149,12 +149,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Card 3: Labor Cost Est */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Labor Cost Est.</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Geschätzte Personalkosten</p>
           <p className="text-2xl font-bold text-slate-900">
-            ${stats.estimatedWeeklyPayroll.toLocaleString()}
+            €{stats.estimatedWeeklyPayroll.toLocaleString()}
           </p>
           <div className="mt-2 text-[10px] text-slate-500 font-medium">
-            Based on active employee hourly rates
+            Basiert auf den Stundensätzen der aktiven Mitarbeiter
           </div>
         </div>
 
@@ -163,16 +163,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           onClick={() => onNavigateTab('schedule')}
           className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
         >
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Shift Coverage</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Schichtabdeckung</p>
           <p className="text-2xl font-bold text-emerald-600">{coveragePercent}%</p>
           <div className="mt-2 text-[10px] font-semibold text-rose-500 flex items-center gap-1">
             {stats.unassignedShiftsCount > 0 ? (
               <>
                 <AlertTriangle className="w-3 h-3" />
-                <span>{stats.unassignedShiftsCount} unfilled shift gaps</span>
+                <span>{stats.unassignedShiftsCount} unbesetzte Schichten</span>
               </>
             ) : (
-              <span className="text-emerald-600">All shifts covered!</span>
+              <span className="text-emerald-600">Alle Schichten besetzt!</span>
             )}
           </div>
         </div>
@@ -184,14 +184,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Today's On-Duty Roster</h2>
-              <p className="text-xs text-slate-500">Live roster for {format(new Date(), 'MMM d, yyyy')}</p>
+              <h2 className="text-base font-bold text-slate-900">Heutiger Dienstplan</h2>
+              <p className="text-xs text-slate-500">Tagesplan für {format(new Date(), 'd. MMM yyyy')}</p>
             </div>
             <button
               onClick={() => onNavigateTab('schedule')}
-              className="text-xs font-bold text-blue-600 hover:underline uppercase tracking-tight flex items-center gap-1"
+              className="text-xs font-bold text-blue-600 hover:underline uppercase tracking-tight flex items-center gap-1 cursor-pointer"
             >
-              Full Calendar
+              Gesamter Kalender
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -199,12 +199,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {todaysShifts.length === 0 ? (
             <div className="text-center py-10 border-2 border-dashed border-slate-200 rounded-lg bg-slate-50/50">
               <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs text-slate-600 font-medium">No shifts scheduled for today.</p>
+              <p className="text-xs text-slate-600 font-medium">Heute keine Schichten geplant.</p>
               <button
                 onClick={onOpenAddShift}
-                className="mt-2 text-xs text-blue-600 font-semibold hover:underline"
+                className="mt-2 text-xs text-blue-600 font-semibold hover:underline cursor-pointer"
               >
-                + Add shift for today
+                + Schicht für heute hinzufügen
               </button>
             </div>
           ) : (
@@ -221,17 +221,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     >
                       <div>
                         <p className="font-bold uppercase text-[9px] tracking-wider text-rose-700">
-                          Unassigned Shift
+                          Unbesetzte Schicht
                         </p>
                         <p className="font-semibold text-slate-800">
-                          {shift.position} Required • {shift.startTime} - {shift.endTime}
+                          {shift.position} erforderlich • {shift.startTime} - {shift.endTime}
                         </p>
                       </div>
                       <button
                         onClick={onOpenAutoScheduler}
-                        className="text-[11px] bg-white border border-red-200 text-rose-700 font-semibold px-2.5 py-1 rounded hover:bg-rose-100/50"
+                        className="text-[11px] bg-white border border-red-200 text-rose-700 font-semibold px-2.5 py-1 rounded hover:bg-rose-100/50 cursor-pointer"
                       >
-                        Auto-Fill
+                        Auto-Besetzen
                       </button>
                     </div>
                   );
@@ -268,12 +268,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
             <div className="p-4 border-b border-slate-100 flex justify-between items-center">
-              <h3 className="text-sm font-bold text-slate-900">Team Roster & Status</h3>
+              <h3 className="text-sm font-bold text-slate-900">Teamübersicht & Status</h3>
               <button
                 onClick={() => onNavigateTab('employees')}
-                className="text-[10px] font-bold text-blue-600 uppercase tracking-tight hover:underline"
+                className="text-[10px] font-bold text-blue-600 uppercase tracking-tight hover:underline cursor-pointer"
               >
-                Manage All
+                Alle verwalten
               </button>
             </div>
 
@@ -299,7 +299,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-slate-900 leading-tight truncate">{emp.name}</p>
                       <p className="text-[10px] text-slate-500 uppercase font-medium truncate">
-                        {emp.position} • Max {emp.maxWeeklyHours}h
+                        {emp.position} • Max {emp.maxWeeklyHours} Std.
                       </p>
                     </div>
                     <div
@@ -316,9 +316,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="p-3 border-t border-slate-100">
               <button
                 onClick={onOpenAddEmployee}
-                className="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
+                className="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                + Add New Employee
+                + Neuen Mitarbeiter hinzufügen
               </button>
             </div>
           </div>

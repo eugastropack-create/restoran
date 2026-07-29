@@ -77,11 +77,11 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
     e.preventDefault();
     setRegErrorMsg('');
     if (!regName || !regEmail || !regPassword) {
-      setRegErrorMsg('Lütfen ad, e-posta ve şifre alanlarını doldurunuz.');
+      setRegErrorMsg('Bitte füllen Sie Name, E-Mail und Passwort aus.');
       return;
     }
     if (regPassword.length < 4) {
-      setRegErrorMsg('Şifre en az 4 karakter olmalıdır.');
+      setRegErrorMsg('Das Passwort muss mindestens 4 Zeichen lang sein.');
       return;
     }
 
@@ -108,20 +108,20 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
     setLoginError('');
 
     if (!loginEmail || !loginPassword) {
-      setLoginError('E-posta ve şifre girilmesi zorunludur.');
+      setLoginError('E-Mail und Passwort sind erforderlich.');
       return;
     }
 
     const matchedUser = users.find((u) => u.email.toLowerCase() === loginEmail.trim().toLowerCase());
 
     if (!matchedUser) {
-      setLoginError('Bu e-posta adresi ile kayıtlı çalışan bulunamadı.');
+      setLoginError('Mit dieser E-Mail-Adresse wurde kein Mitarbeiter gefunden.');
       return;
     }
 
     const validPassword = matchedUser.password || '123456';
     if (loginPassword !== validPassword) {
-      setLoginError('Hatalı şifre! Lütfen şifrenizi kontrol edip tekrar deneyin.');
+      setLoginError('Falsches Passwort! Bitte versuchen Sie es erneut.');
       return;
     }
 
@@ -153,7 +153,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
       setEmpModalTarget(null);
       onEmployeeLogin(matchedUser);
     } else {
-      setEmpModalError('Hatalı şifre! (Varsayılan şifre: 123456)');
+      setEmpModalError('Falsches Passwort! (Standard-Passwort: 123456)');
     }
   };
 
@@ -171,7 +171,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
       setIsManagerPasswordModalOpen(false);
       onManagerLogin(managerUser);
     } else {
-      setPasswordError('Hatalı şifre! Lütfen yöneticinize danışın.');
+      setPasswordError('Falsches Passwort! Bitte fragen Sie Ihren Manager.');
     }
   };
 
@@ -191,10 +191,10 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             <h1 className="font-extrabold text-xl tracking-tight text-white flex items-center gap-2">
               StaffSync Pro
               <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono font-medium">
-                Vardiya Portalı
+                Dienstplan-Portal
               </span>
             </h1>
-            <p className="text-xs text-slate-400">Çalışan Vardiya ve Müsaitlik Portalı</p>
+            <p className="text-xs text-slate-400">Mitarbeiter-Schicht & Verfügbarkeitsportal</p>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer"
         >
           <ShieldCheck className="w-4 h-4 text-blue-400" />
-          <span>Yönetici Girişi (Manager Portal)</span>
+          <span>Manager-Anmeldung</span>
         </button>
       </header>
 
@@ -214,46 +214,38 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Çalışan Vardiya & Müsaitlik Giriş Sistemi</span>
+              <span>Mitarbeiter Schicht- & Verfügbarkeitssystem</span>
             </div>
 
             <h2 className="text-3xl font-black tracking-tight text-white leading-tight">
-              Çalışma Günlerinizi ve Şube Tercihlerinizi Bildirin.
+              Geben Sie Ihre Arbeitstage und Schichtverfügbarkeiten an.
             </h2>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Restoran şubelerinde görev alan çalışanlar için hazırlanmış ortak vardiya bildirimi platformudur.
+              Praktische Dienstplan- und Verfügbarkeitsplattform für Mitarbeiter.
             </p>
 
             <div className="space-y-3 pt-2">
               <div className="flex items-start gap-3 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <div className="font-bold text-white">Çalışmak İstediğiniz Günleri Seçin</div>
-                  <div className="text-slate-400">Haftalık hangi günlerde izinli veya müsait olduğunuzu belirtin.</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
-                <Building2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="text-xs">
-                  <div className="font-bold text-white">Şube Tercihi</div>
-                  <div className="text-slate-400">Çalışabileceğiniz şubelerdeki müsaitliğinizi bildirin.</div>
+                  <div className="font-bold text-white">Wählen Sie Ihre Arbeitstage</div>
+                  <div className="text-slate-400">Geben Sie an, an welchen Tagen Sie verfügbar oder abwesend sind.</div>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
                 <Clock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <div className="font-bold text-white">Maksimum Saat Sınırı Belirleyin</div>
-                  <div className="text-slate-400">Haftalık hedef çalışma saati limitinizi yöneticiye iletin.</div>
+                  <div className="font-bold text-white">Maximale Wochenstunden festlegen</div>
+                  <div className="text-slate-400">Teilen Sie Ihr gewünschtes wöchentliches Stundenlimit der Betriebsleitung mit.</div>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="pt-6 border-t border-slate-800/80 mt-6 flex items-center justify-between text-xs text-slate-400">
-            <span>Şube Vardiya Sistemi</span>
+            <span>Standort-Dienstplansystem</span>
             <span className="font-mono text-blue-400">v2.4 Shared-Staff System</span>
           </div>
         </div>
@@ -266,26 +258,26 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveMode('EMPLOYEE_LOGIN')}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   activeMode === 'EMPLOYEE_LOGIN'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Çalışan Girişi</span>
+                <span>Mitarbeiter-Login</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveMode('EMPLOYEE_REGISTER')}
-                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   activeMode === 'EMPLOYEE_REGISTER'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
-                <span>Yeni Kayıt Ol</span>
+                <span>Neuregistrierung</span>
               </button>
             </div>
 
@@ -293,9 +285,9 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             {activeMode === 'EMPLOYEE_LOGIN' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-extrabold text-slate-900">Çalışan Hesabına Giriş Yap</h3>
+                  <h3 className="text-xl font-extrabold text-slate-900">Mitarbeiter-Anmeldung</h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Müsaitlik durumunuzu ve vardiya tercihlerinizi girmek için hesabınızla veya profilinizi seçerek giriş yapın.
+                    Melden Sie sich an, um Ihre Verfügbarkeiten und Schichteinstellungen einzugeben.
                   </p>
                 </div>
 
@@ -303,7 +295,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 <form onSubmit={handleDirectEmployeeLogin} className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
                   <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mb-1">
                     <LogIn className="w-4 h-4 text-blue-600" />
-                    <span>E-posta ve Şifre ile Giriş:</span>
+                    <span>Login mit E-Mail und Passwort:</span>
                   </div>
 
                   {loginError && (
@@ -314,13 +306,13 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                   )}
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">E-posta Adresi:</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">E-Mail-Adresse:</label>
                     <div className="relative">
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                       <input
                         type="email"
                         required
-                        placeholder="calisan@restoran.com"
+                        placeholder="mitarbeiter@restoran.com"
                         value={loginEmail}
                         onChange={(e) => {
                           setLoginEmail(e.target.value);
@@ -332,7 +324,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Şifre:</label>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">Passwort:</label>
                     <div className="relative">
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                       <input
@@ -353,7 +345,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>Giriş Yap</span>
+                    <span>Anmelden</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
@@ -361,7 +353,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 {/* Direct Quick Account Selection */}
                 <div className="space-y-2 pt-2 border-t border-slate-100">
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Veya Kayıtlı Çalışan Profilini Seç:
+                    Oder wählen Sie Ihr Mitarbeiterprofil:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                     {employees.map((emp) => (
@@ -377,7 +369,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                             <Lock className="w-3 h-3 text-slate-400" />
                           </div>
                           <div className="text-[10px] text-slate-500">
-                            Çalışan
+                            Mitarbeiter
                           </div>
                         </div>
                         <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
@@ -392,16 +384,16 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             {activeMode === 'EMPLOYEE_REGISTER' && (
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-xl font-extrabold text-slate-900">Yeni Çalışan Kaydı</h3>
+                  <h3 className="text-xl font-extrabold text-slate-900">Neuer Mitarbeiter Registrierung</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Restoran ekibine katılın ve şifrenizle hemen haftalık vardiya isteklerinizi girmeye başlayın.
+                    Treten Sie dem Team bei und tragen Sie Ihre Schichtwünsche ein.
                   </p>
                 </div>
 
                 {regSuccessMsg && (
                   <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Kaydınız başarıyla tamamlandı! Giriş ekranına yönlendiriliyorsunuz...</span>
+                    <span>Registrierung erfolgreich! Sie werden weitergeleitet...</span>
                   </div>
                 )}
 
@@ -414,13 +406,13 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
                 <form onSubmit={handleRegisterSubmit} className="space-y-3 text-xs">
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Ad Soyad (Full Name):</label>
+                    <label className="block font-semibold text-slate-700 mb-1">Vollständiger Name:</label>
                     <div className="relative">
                       <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                       <input
                         type="text"
                         required
-                        placeholder="Örn: Mehmet Yılmaz"
+                        placeholder="z.B. Max Mustermann"
                         value={regName}
                         onChange={(e) => setRegName(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
@@ -430,13 +422,13 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">E-posta Adresi:</label>
+                      <label className="block font-semibold text-slate-700 mb-1">E-Mail-Adresse:</label>
                       <div className="relative">
                         <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                         <input
                           type="email"
                           required
-                          placeholder="mehmet@restoran.com"
+                          placeholder="max@restoran.com"
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
                           className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
@@ -445,13 +437,13 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     </div>
 
                     <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Şifre Belirleyin (Password):</label>
+                      <label className="block font-semibold text-slate-700 mb-1">Passwort festlegen:</label>
                       <div className="relative">
                         <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                         <input
                           type="password"
                           required
-                          placeholder="En az 4 karakter"
+                          placeholder="Mindestens 4 Zeichen"
                           value={regPassword}
                           onChange={(e) => setRegPassword(e.target.value)}
                           className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
@@ -460,57 +452,25 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Telefon Numarası:</label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                        <input
-                          type="text"
-                          placeholder="0532 000 0000"
-                          value={regPhone}
-                          onChange={(e) => setRegPhone(e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Görev / Pozisyon:</label>
-                      <select
-                        value={regPosition}
-                        onChange={(e) => setRegPosition(e.target.value as Position)}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600"
-                      >
-                        <option value="Waiter">Garson (Waiter)</option>
-                        <option value="Chef">Aşçı / Şef (Chef)</option>
-                        <option value="Barista">Barista / Barmen</option>
-                        <option value="Kitchen Helper">Mutfak Yardımcısı</option>
-                        <option value="Dishwasher">Bulaşıkçı (Dishwasher)</option>
-                        <option value="Host">Karşılama / Host</option>
-                      </select>
-                    </div>
-                  </div>
-
                   <div>
-                    <label className="block font-semibold text-slate-700 mb-1">Maks. Haftalık Hedef Saat:</label>
-                    <input
-                      type="number"
-                      min={10}
-                      max={60}
-                      value={regMaxHours}
-                      onChange={(e) => setRegMaxHours(Number(e.target.value))}
-                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600"
-                    />
+                    <label className="block font-semibold text-slate-700 mb-1">Telefonnummer:</label>
+                    <div className="relative">
+                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="text"
+                        placeholder="0170 000 0000"
+                        value={regPhone}
+                        onChange={(e) => setRegPhone(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                      />
+                    </div>
                   </div>
-
-
 
                   <button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                   >
-                    <span>Şifre ile Kayıt Ol ve Giriş Yap</span>
+                    <span>Registrieren & Anmelden</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
@@ -525,7 +485,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               className="text-blue-600 font-semibold hover:underline cursor-pointer flex items-center gap-1"
             >
               <Lock className="w-3 h-3" />
-              <span>Yönetici Paneline Geçiş Yap →</span>
+              <span>Zum Manager-Portal →</span>
             </button>
           </div>
         </div>
@@ -533,7 +493,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
       {/* Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 text-center text-xs text-slate-500 border-t border-slate-900/60 z-10">
-        Ortak Vardiya Planlama ve Otomatik Çizelge Portalı.
+        Dienstplan- und Schichtverwaltungsportal.
       </footer>
 
       {/* QUICK EMPLOYEE PASSWORD MODAL OVERLAY */}
@@ -542,7 +502,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setEmpModalTarget(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors"
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -553,7 +513,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               </div>
               <div>
                 <h3 className="text-base font-extrabold text-white">{empModalTarget.name}</h3>
-                <p className="text-xs text-slate-400">{empModalTarget.email} • Şifrenizi girin</p>
+                <p className="text-xs text-slate-400">{empModalTarget.email} • Passwort eingeben</p>
               </div>
             </div>
 
@@ -567,7 +527,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">
-                  Çalışan Şifresi:
+                  Mitarbeiter-Passwort:
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -584,7 +544,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-blue-500"
                   />
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">Varsayılan demo çalışan şifresi: <code className="text-blue-400 font-mono">123456</code></p>
+                <p className="text-[11px] text-slate-500 mt-1">Standard Demo-Passwort: <code className="text-blue-400 font-mono">123456</code></p>
               </div>
 
               <div className="flex items-center gap-2 pt-2">
@@ -593,14 +553,14 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                   onClick={() => setEmpModalTarget(null)}
                   className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer"
                 >
-                  İptal
+                  Abbrechen
                 </button>
                 <button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Giriş Yap</span>
+                  <span>Anmelden</span>
                 </button>
               </div>
             </form>
@@ -614,7 +574,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
             <button
               onClick={() => setIsManagerPasswordModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors"
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -624,8 +584,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-extrabold text-white">Yönetici Giriş Doğrulaması</h3>
-                <p className="text-xs text-slate-400">Manager Portal erişimi için şifreyi giriniz</p>
+                <h3 className="text-lg font-extrabold text-white">Manager-Authentifizierung</h3>
+                <p className="text-xs text-slate-400">Passwort für Manager-Zugang eingeben</p>
               </div>
             </div>
 
@@ -639,7 +599,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">
-                  Yönetici Şifresi (Manager Password):
+                  Manager-Passwort:
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -664,14 +624,14 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                   onClick={() => setIsManagerPasswordModalOpen(false)}
                   className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer"
                 >
-                  İptal
+                  Abbrechen
                 </button>
                 <button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Giriş Yap</span>
+                  <span>Anmelden</span>
                 </button>
               </div>
             </form>

@@ -68,6 +68,8 @@ export interface AvailabilityRequest {
   requestedMaxHours: number;
   preferredRestaurantId?: string; // 'rest-1', 'rest-2', or 'ALL'
   dayRestaurantPreferences?: Partial<Record<DayOfWeek, string>>; // e.g. { Monday: 'rest-1', Friday: 'rest-2' }
+  selectedWeek?: string; // e.g. '1. Hafta', '2. Hafta', '3. Hafta'
+  dayAvailabilityTypes?: Partial<Record<DayOfWeek, 'Tam Gün' | 'Yarım Gün (Sabah)' | 'Yarım Gün (Akşam)' | 'İzinli'>>;
   reason?: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   createdAt: string;

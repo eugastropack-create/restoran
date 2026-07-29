@@ -59,25 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-lg tracking-tight text-white">StaffSync Pro</span>
                 <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded font-mono font-medium">
-                  2 Restoran Ortak Çalışan
+                  2 Restaurants & Gemeinsames Team
                 </span>
-              </div>
-
-              {/* Restaurant Selection Dropdown */}
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                <select
-                  value={selectedRestaurantFilter}
-                  onChange={(e) => onSelectRestaurantFilter(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 text-white font-medium text-xs rounded px-2 py-0.5 focus:outline-none focus:border-blue-500 cursor-pointer"
-                >
-                  <option value="ALL"> Her İki Restoran (Ortak Görünüm)</option>
-                  {restaurants.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
           </div>
@@ -109,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Calendar className="w-4 h-4" />
-                  Weekly Schedule
+                  Wochenplan
                 </button>
 
                 <button
@@ -122,7 +105,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Users className="w-4 h-4" />
-                  Employees
+                  Mitarbeiter
                 </button>
 
                 <button
@@ -135,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Clock className="w-4 h-4" />
-                  Availability
+                  Verfügbarkeit
                 </button>
 
                 <button
@@ -148,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Printer className="w-4 h-4" />
-                  Export & Print
+                  Export & Drucken
                 </button>
               </>
             ) : (
@@ -163,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Clock className="w-4 h-4 text-blue-400" />
-                  Müsaitlik & Vardiya İsteği
+                  Verfügbarkeit & Anfragen
                 </button>
 
                 <button
@@ -176,7 +159,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Calendar className="w-4 h-4 text-emerald-400" />
-                  Benim Vardiyalarım
+                  Meine Schichten
                 </button>
 
                 <button
@@ -189,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <Printer className="w-4 h-4 text-slate-400" />
-                  Standort Vardiya Çizelgesi
+                  Dienstplan-Ansicht
                 </button>
               </>
             )}
@@ -204,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-sm transition-all transform active:scale-95"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Auto-Generate Schedule</span>
+                <span>Autom. Dienstplan erstellen</span>
               </button>
             )}
 
@@ -220,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <div className="text-left hidden sm:block">
                   <div className="font-semibold text-white leading-tight">{currentUser?.name}</div>
-                  <div className="text-[10px] text-blue-400 font-medium">{currentUser?.role === 'Manager' ? 'Yönetici' : 'Çalışan'}</div>
+                  <div className="text-[10px] text-blue-400 font-medium">{currentUser?.role === 'Manager' ? 'Manager' : 'Mitarbeiter'}</div>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
@@ -232,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <div className="text-[11px] text-slate-400 font-medium truncate">{currentUser?.email}</div>
                     <div className="mt-1">
                       <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">
-                        {currentUser?.role === 'Manager' ? 'Yönetici Portalı' : 'Çalışan Hesabı'}
+                        {currentUser?.role === 'Manager' ? 'Manager-Portal' : 'Mitarbeiter-Konto'}
                       </span>
                     </div>
                   </div>
@@ -246,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="w-full flex items-center gap-2 text-xs text-rose-300 hover:text-white px-3 py-2 rounded-lg hover:bg-rose-900/40 transition-colors font-bold"
                     >
                       <LogOut className="w-4 h-4 text-rose-400" />
-                      <span>Çıkış Yap</span>
+                      <span>Abmelden</span>
                     </button>
                     {isManager && (
                       <button
@@ -257,7 +240,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-700 transition-colors"
                       >
                         <Building2 className="w-4 h-4 text-slate-400" />
-                        <span>Yeni Şube Ekle</span>
+                        <span>Neues Restaurant hinzufügen</span>
                       </button>
                     )}
                   </div>
@@ -282,20 +265,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab('schedule')}
               className={`p-2 rounded ${activeTab === 'schedule' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              Schedule
+              Wochenplan
             </button>
 
             <button
               onClick={() => setActiveTab('employees')}
               className={`p-2 rounded ${activeTab === 'employees' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              Employees
+              Mitarbeiter
             </button>
             <button
               onClick={() => setActiveTab('requests')}
               className={`p-2 rounded ${activeTab === 'requests' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              Requests
+              Verfügbarkeit
             </button>
             <button
               onClick={() => setActiveTab('export')}
@@ -310,19 +293,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab('portal')}
               className={`p-2 rounded ${activeTab === 'portal' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              My Shifts
+              Schichten
             </button>
             <button
               onClick={() => setActiveTab('requests')}
               className={`p-2 rounded ${activeTab === 'requests' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              Availability
+              Verfügbarkeit
             </button>
             <button
               onClick={() => setActiveTab('export')}
               className={`p-2 rounded ${activeTab === 'export' ? 'text-amber-400 font-bold' : 'text-slate-400'}`}
             >
-              View Roster
+              Dienstplan
             </button>
           </>
         )}

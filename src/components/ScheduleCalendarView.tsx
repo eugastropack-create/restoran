@@ -137,23 +137,23 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <button
               id="btn-prev-week"
               onClick={handlePrevWeek}
-              className="p-1.5 hover:bg-white rounded text-slate-700 transition-colors"
-              title="Previous Week"
+              className="p-1.5 hover:bg-white rounded text-slate-700 transition-colors cursor-pointer"
+              title="Vorherige Woche"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               id="btn-today-week"
               onClick={handleTodayWeek}
-              className="px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-white rounded transition-colors"
+              className="px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-white rounded transition-colors cursor-pointer"
             >
-              Current Week
+              Aktuelle Woche
             </button>
             <button
               id="btn-next-week"
               onClick={handleNextWeek}
-              className="p-1.5 hover:bg-white rounded text-slate-700 transition-colors"
-              title="Next Week"
+              className="p-1.5 hover:bg-white rounded text-slate-700 transition-colors cursor-pointer"
+              title="Nächste Woche"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -163,12 +163,12 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-blue-600" />
               <span>
-                {format(currentWeekStart, 'MMM d')} -{' '}
-                {format(addDays(currentWeekStart, 6), 'MMM d, yyyy')}
+                {format(currentWeekStart, 'd. MMM')} -{' '}
+                {format(addDays(currentWeekStart, 6), 'd. MMM yyyy')}
               </span>
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              {filteredShifts.length} shifts scheduled this week
+              {filteredShifts.length} Schichten in dieser Woche geplant
             </p>
           </div>
         </div>
@@ -178,28 +178,28 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
           <button
             id="btn-auto-scheduler-calendar"
             onClick={onOpenAutoScheduler}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-all"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            <span>Auto-Generate Schedule</span>
+            <span>Autom. Dienstplan erstellen</span>
           </button>
 
           <button
             id="btn-publish-schedule"
             onClick={handlePublishClick}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Send className="w-4 h-4" />
-            <span>Publish Schedule</span>
+            <span>Dienstplan veröffentlichen</span>
           </button>
 
           <button
             id="btn-add-shift-calendar"
             onClick={() => onOpenAddShift()}
-            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Shift</span>
+            <span>Schicht hinzufügen</span>
           </button>
         </div>
       </div>
@@ -218,9 +218,9 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             id="filter-position-select"
             value={selectedPositionFilter}
             onChange={(e) => setSelectedPositionFilter(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-400"
+            className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
           >
-            <option value="ALL">All Positions</option>
+            <option value="ALL">Alle Positionen</option>
             {POSITIONS.map((pos) => (
               <option key={pos} value={pos}>
                 {pos}
@@ -233,9 +233,9 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             id="filter-employee-select"
             value={selectedEmployeeFilter}
             onChange={(e) => setSelectedEmployeeFilter(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-400"
+            className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
           >
-            <option value="ALL">All Employees</option>
+            <option value="ALL">Alle Mitarbeiter</option>
             {employees.map((emp) => (
               <option key={emp.id} value={emp.id}>
                 {emp.name} ({emp.position})
@@ -247,27 +247,27 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
           <div className="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700 text-xs font-medium">
             <button
               onClick={() => setGroupBy('LOCATION')}
-              className={`px-2.5 py-1 rounded transition-colors ${
+              className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                 groupBy === 'LOCATION' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400'
               }`}
             >
-              By Location (Standort)
+              Nach Standort
             </button>
             <button
               onClick={() => setGroupBy('POSITION')}
-              className={`px-2.5 py-1 rounded transition-colors ${
+              className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                 groupBy === 'POSITION' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400'
               }`}
             >
-              By Position
+              Nach Position
             </button>
             <button
               onClick={() => setGroupBy('EMPLOYEE')}
-              className={`px-2.5 py-1 rounded transition-colors ${
+              className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
                 groupBy === 'EMPLOYEE' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400'
               }`}
             >
-              By Employee
+              Nach Mitarbeiter
             </button>
           </div>
         </div>
@@ -277,7 +277,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
           <div className="flex items-center gap-2 bg-red-500/20 border border-red-500/40 text-red-300 text-xs px-3 py-1.5 rounded-lg">
             <AlertCircle className="w-4 h-4 text-red-400" />
             <span>
-              <strong>{unassignedWeekShifts.length} unfilled shifts</strong>. Click Auto-Generate to auto-assign.
+              <strong>{unassignedWeekShifts.length} unbesetzte Schichten</strong>. Klicken Sie auf "Autom. Dienstplan erstellen" zur automatischen Zuweisung.
             </span>
           </div>
         )}
@@ -291,11 +291,21 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-bold uppercase">
                 <th className="p-3 text-left w-44 border-r border-slate-200 sticky left-0 bg-slate-50 z-10">
-                  {groupBy === 'LOCATION' ? 'Standort / Location' : groupBy === 'POSITION' ? 'Position' : 'Employee'}
+                  {groupBy === 'LOCATION' ? 'Standort' : groupBy === 'POSITION' ? 'Position' : 'Mitarbeiter'}
                 </th>
                 {weekDays.map((day) => {
                   const dateStr = format(day, 'yyyy-MM-dd');
                   const isToday = isSameDay(day, new Date());
+                  const dayNames: Record<string, string> = {
+                    Mon: 'Mo',
+                    Tue: 'Di',
+                    Wed: 'Mi',
+                    Thu: 'Do',
+                    Fri: 'Fr',
+                    Sat: 'Sa',
+                    Sun: 'So',
+                  };
+                  const formattedDay = format(day, 'EEE');
 
                   return (
                     <th
@@ -305,7 +315,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                       }`}
                     >
                       <div>
-                        {format(day, 'EEE')}{' '}
+                        {dayNames[formattedDay] || formattedDay}{' '}
                         <span className="text-slate-900 font-bold">{format(day, 'd')}</span>
                       </div>
                     </th>
@@ -319,8 +329,8 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
               {groupBy === 'LOCATION' ? (
                 // Grouped by Location (Standort - Restoran)
                 [
-                  { id: 'rest-1', name: 'Ottensen', fullName: 'Bistro Bella (Ottensen)' },
-                  { id: 'rest-2', name: 'Altona', fullName: 'Trattoria Milano (Altona)' },
+                  { id: 'rest-1', name: 'Restoran 1', fullName: 'Restoran 1' },
+                  { id: 'rest-2', name: 'Restoran 2', fullName: 'Restoran 2' },
                 ].map((loc) => (
                   <tr key={loc.id} className="hover:bg-slate-50/50 transition-colors">
                     {/* Location Label Column */}
@@ -361,7 +371,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                       className={`p-2 rounded text-[11px] ${posStyle.card} relative group/card shadow-2xs hover:shadow-sm transition-all`}
                                     >
                                       <p className="font-extrabold text-slate-900 leading-tight">
-                                        {emp ? emp.name : 'Staff Member'}
+                                        {emp ? emp.name : 'Unbesetzt'}
                                       </p>
                                       <p className="text-slate-600 font-medium text-[10px]">
                                         {shift.position} • {shift.startTime} - {shift.endTime}
@@ -371,13 +381,13 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                       <div className="opacity-0 group-hover/card:opacity-100 transition-opacity absolute top-1 right-1 bg-white rounded p-0.5 border border-slate-200 shadow flex items-center gap-1">
                                         <button
                                           onClick={() => onOpenEditShift(shift)}
-                                          className="p-1 hover:bg-blue-100 text-blue-700 rounded"
+                                          className="p-1 hover:bg-blue-100 text-blue-700 rounded cursor-pointer"
                                         >
                                           <Edit2 className="w-3 h-3" />
                                         </button>
                                         <button
                                           onClick={() => onDeleteShift(shift.id)}
-                                          className="p-1 hover:bg-rose-100 text-rose-700 rounded"
+                                          className="p-1 hover:bg-rose-100 text-rose-700 rounded cursor-pointer"
                                         >
                                           <Trash2 className="w-3 h-3" />
                                         </button>
@@ -395,11 +405,11 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
                             {/* + Add Shift Button */}
                             <button
-                              onClick={() => onOpenAddShift(dateStr, 'Waiter', loc.id)}
-                              className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all mt-auto"
+                              onClick={() => onOpenAddShift(dateStr, 'Çalışan', loc.id)}
+                              className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all mt-auto cursor-pointer"
                             >
                               <Plus className="w-3 h-3" />
-                              <span>Vardiya Ekle</span>
+                              <span>Schicht hinzufügen</span>
                             </button>
                           </div>
                         </td>
@@ -450,7 +460,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                     key={shift.id}
                                     className="bg-red-50 border border-dashed border-red-300 p-2 rounded text-[11px] text-red-600 relative group/card shadow-2xs"
                                   >
-                                    <p className="font-bold uppercase text-[9px]">Missing Position</p>
+                                    <p className="font-bold uppercase text-[9px]">Unbesetzt</p>
                                     <p className="font-semibold text-slate-900">
                                       {shift.startTime} - {shift.endTime}
                                     </p>
@@ -459,13 +469,13 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                     <div className="opacity-0 group-hover/card:opacity-100 transition-opacity absolute top-1 right-1 bg-white rounded p-0.5 border border-slate-200 shadow flex items-center gap-1">
                                       <button
                                         onClick={() => onOpenEditShift(shift)}
-                                        className="p-1 hover:bg-slate-100 text-slate-700 rounded"
+                                        className="p-1 hover:bg-slate-100 text-slate-700 rounded cursor-pointer"
                                       >
                                         <Edit2 className="w-3 h-3" />
                                       </button>
                                       <button
                                         onClick={() => onDeleteShift(shift.id)}
-                                        className="p-1 hover:bg-rose-100 text-rose-700 rounded"
+                                        className="p-1 hover:bg-rose-100 text-rose-700 rounded cursor-pointer"
                                       >
                                         <Trash2 className="w-3 h-3" />
                                       </button>
@@ -480,7 +490,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                   className={`p-2 rounded text-[11px] ${posStyle.card} relative group/card shadow-2xs hover:shadow-sm transition-all`}
                                 >
                                   <p className="font-bold text-slate-900 leading-tight">
-                                    {emp ? emp.name : 'Staff Member'}
+                                    {emp ? emp.name : 'Mitarbeiter'}
                                   </p>
                                   <p className="text-slate-500 text-[10px]">
                                     {shift.position} • {shift.startTime} - {shift.endTime}
@@ -490,13 +500,13 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                   <div className="opacity-0 group-hover/card:opacity-100 transition-opacity absolute top-1 right-1 bg-white rounded p-0.5 border border-slate-200 shadow flex items-center gap-1">
                                     <button
                                       onClick={() => onOpenEditShift(shift)}
-                                      className="p-1 hover:bg-blue-100 text-blue-700 rounded"
+                                      className="p-1 hover:bg-blue-100 text-blue-700 rounded cursor-pointer"
                                     >
                                       <Edit2 className="w-3 h-3" />
                                     </button>
                                     <button
                                       onClick={() => onDeleteShift(shift.id)}
-                                      className="p-1 hover:bg-rose-100 text-rose-700 rounded"
+                                      className="p-1 hover:bg-rose-100 text-rose-700 rounded cursor-pointer"
                                     >
                                       <Trash2 className="w-3 h-3" />
                                     </button>
@@ -508,10 +518,10 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                             {/* + Add Shift Button */}
                             <button
                               onClick={() => onOpenAddShift(dateStr, position)}
-                              className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all"
+                              className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all cursor-pointer"
                             >
                               <Plus className="w-3 h-3" />
-                              <span>Shift</span>
+                              <span>Schicht</span>
                             </button>
                           </div>
                         </td>
@@ -532,7 +542,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                         <div>
                           <div className="font-bold text-slate-900">{emp.name}</div>
                           <div className="text-[10px] text-slate-500 font-medium uppercase">
-                            {emp.position} • Max {emp.maxWeeklyHours}h
+                            {emp.position} • Max {emp.maxWeeklyHours} Std.
                           </div>
                         </div>
                       </td>
@@ -569,13 +579,13 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                     <div className="opacity-0 group-hover/card:opacity-100 transition-opacity absolute top-1 right-1 bg-white rounded p-0.5 border border-slate-200 shadow flex items-center gap-1">
                                       <button
                                         onClick={() => onOpenEditShift(shift)}
-                                        className="p-1 hover:bg-blue-100 text-blue-700 rounded"
+                                        className="p-1 hover:bg-blue-100 text-blue-700 rounded cursor-pointer"
                                       >
                                         <Edit2 className="w-3 h-3" />
                                       </button>
                                       <button
                                         onClick={() => onDeleteShift(shift.id)}
-                                        className="p-1 hover:bg-rose-100 text-rose-700 rounded"
+                                        className="p-1 hover:bg-rose-100 text-rose-700 rounded cursor-pointer"
                                       >
                                         <Trash2 className="w-3 h-3" />
                                       </button>
@@ -586,10 +596,10 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
                               <button
                                 onClick={() => onOpenAddShift(dateStr, emp.position)}
-                                className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all"
+                                className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />
-                                <span>Shift</span>
+                                <span>Schicht</span>
                               </button>
                             </div>
                           </td>
