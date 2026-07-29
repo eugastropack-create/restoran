@@ -419,6 +419,7 @@ export default function App() {
     isSharedStaff: boolean;
     hourlyRate: number;
     maxWeeklyHours: number;
+    password: string;
   }) => {
     const newEmpId = `emp-${Date.now()}`;
     const newEmp: Employee = {
@@ -445,6 +446,7 @@ export default function App() {
       role: 'Employee',
       employeeId: newEmpId,
       restaurantId: 'rest-1',
+      password: empData.password,
     };
 
     setEmployees((prev) => [newEmp, ...prev]);

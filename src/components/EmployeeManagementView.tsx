@@ -25,7 +25,7 @@ interface EmployeeManagementViewProps {
   setIsAddOpen: (open: boolean) => void;
 }
 
-const POSITIONS: Position[] = ['Waiter', 'Chef', 'Cashier', 'Barista', 'Kitchen staff'];
+const POSITIONS: Position[] = ['Çalışan'];
 const DAYS_OF_WEEK: DayOfWeek[] = [
   'Monday',
   'Tuesday',
@@ -52,7 +52,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [position, setPosition] = useState<Position>('Waiter');
+  const [position, setPosition] = useState<Position>('Çalışan');
   const [employmentType, setEmploymentType] = useState<EmploymentType>('Full-time');
   const [maxWeeklyHours, setMaxWeeklyHours] = useState<number>(40);
   const [hourlyRate, setHourlyRate] = useState<number>(18.5);

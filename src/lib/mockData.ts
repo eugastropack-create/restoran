@@ -50,6 +50,7 @@ export const INITIAL_USERS: User[] = [
     name: 'Sarah Jenkins',
     role: 'Manager',
     restaurantId: 'rest-1',
+    password: 'serkan1907',
   },
   {
     id: 'usr-2',
@@ -58,6 +59,7 @@ export const INITIAL_USERS: User[] = [
     role: 'Employee',
     restaurantId: 'rest-1',
     employeeId: 'emp-1',
+    password: '123456',
   },
   {
     id: 'usr-3',
@@ -66,6 +68,7 @@ export const INITIAL_USERS: User[] = [
     role: 'Employee',
     restaurantId: 'rest-1',
     employeeId: 'emp-2',
+    password: '123456',
   },
   {
     id: 'usr-4',
@@ -74,6 +77,7 @@ export const INITIAL_USERS: User[] = [
     role: 'Employee',
     restaurantId: 'rest-2',
     employeeId: 'emp-3',
+    password: '123456',
   },
 ];
 

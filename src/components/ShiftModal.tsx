@@ -29,7 +29,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
   const [date, setDate] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('09:00');
   const [endTime, setEndTime] = useState<string>('17:00');
-  const [position, setPosition] = useState<Position>('Waiter');
+  const [position, setPosition] = useState<Position>('Çalışan');
   const [assignedEmployeeId, setAssignedEmployeeId] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
 
@@ -164,12 +164,10 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
             >
               <option value="">-- Unassigned (Draft Shift) --</option>
               {employees.map((emp) => {
-                const matchesPos = emp.position === position;
                 const isUnavailable = emp.unavailableDays.includes(selectedDayOfWeek);
 
-                let label = `${emp.name} (${emp.position})`;
+                let label = `${emp.name} (Çalışan)`;
                 if (isUnavailable) label += ' ⚠️ Unavailable on ' + selectedDayOfWeek;
-                if (!matchesPos) label += ' [Different Primary Role]';
 
                 return (
                   <option key={emp.id} value={emp.id}>

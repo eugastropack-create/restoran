@@ -33,6 +33,10 @@ interface DashboardViewProps {
 }
 
 const POSITION_STYLES: Record<Position, { card: string; pill: string }> = {
+  Çalışan: {
+    card: 'bg-blue-50/80 border-l-4 border-blue-500',
+    pill: 'bg-blue-100 text-blue-800 border-blue-200',
+  },
   Waiter: {
     card: 'bg-blue-50/80 border-l-4 border-blue-500',
     pill: 'bg-blue-100 text-blue-800 border-blue-200',

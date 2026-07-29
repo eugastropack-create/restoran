@@ -128,13 +128,8 @@ export function runAutoScheduler(
 
     // Filter candidate employees according to rules
     const candidates = activeEmployees.filter((emp) => {
-      // Rule 1: Position Matching
-      const matchesPrimary = emp.position === shift.position;
-      const matchesSecondary =
-        !options.strictPositionMatch && emp.secondaryPositions?.includes(shift.position);
-      if (!matchesPrimary && !matchesSecondary) {
-        return false;
-      }
+      // Rule 1: Position Restriction Removed - All active employees are eligible as "Çalışan"
+      // (No position restriction)
 
       // Rule 2: Unavailable Days
       if (options.respectUnavailableDays) {

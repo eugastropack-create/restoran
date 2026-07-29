@@ -208,7 +208,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* User Switcher Dropdown */}
+            {/* User Profile Badge & Sign Out */}
             <div className="relative">
               <button
                 id="user-menu-btn"
@@ -220,59 +220,33 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <div className="text-left hidden sm:block">
                   <div className="font-semibold text-white leading-tight">{currentUser?.name}</div>
-                  <div className="text-[10px] text-blue-400 font-medium">{currentUser?.role}</div>
+                  <div className="text-[10px] text-blue-400 font-medium">{currentUser?.role === 'Manager' ? 'Yönetici' : 'Çalışan'}</div>
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {showUserDropdown && (
-                <div className="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50">
-                  <div className="px-3 py-1.5 border-b border-slate-700/60 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Switch Account (Demo Users)
+                <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-2 z-50">
+                  <div className="px-3 py-2 border-b border-slate-700/60">
+                    <div className="font-bold text-white text-xs">{currentUser?.name}</div>
+                    <div className="text-[11px] text-slate-400 font-medium truncate">{currentUser?.email}</div>
+                    <div className="mt-1">
+                      <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-semibold">
+                        {currentUser?.role === 'Manager' ? 'Yönetici Portalı' : 'Çalışan Hesabı'}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="max-h-60 overflow-y-auto py-1">
-                    {users.map((u) => (
-                      <button
-                        key={u.id}
-                        onClick={() => {
-                          onSwitchUser(u);
-                          setShowUserDropdown(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 flex items-center justify-between text-xs hover:bg-slate-700/60 transition-colors ${
-                          u.id === currentUser?.id ? 'bg-blue-500/10 text-blue-400 font-medium' : 'text-slate-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <UserCheck className={`w-3.5 h-3.5 ${u.role === 'Manager' ? 'text-blue-400' : 'text-slate-400'}`} />
-                          <div>
-                            <div className="font-semibold">{u.name}</div>
-                            <div className="text-[10px] text-slate-400">{u.email}</div>
-                          </div>
-                        </div>
-                        <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                            u.role === 'Manager'
-                              ? 'bg-blue-400/20 text-blue-300'
-                              : 'bg-slate-700 text-slate-300'
-                          }`}
-                        >
-                          {u.role}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="border-t border-slate-700/60 pt-1.5 px-2 space-y-1">
+                  <div className="p-2 space-y-1">
                     <button
                       onClick={() => {
                         setShowUserDropdown(false);
                         onSignOut();
                       }}
-                      className="w-full flex items-center gap-2 text-xs text-rose-300 hover:text-white px-2 py-1.5 rounded hover:bg-rose-900/40 transition-colors font-semibold"
+                      className="w-full flex items-center gap-2 text-xs text-rose-300 hover:text-white px-3 py-2 rounded-lg hover:bg-rose-900/40 transition-colors font-bold"
                     >
-                      <LogOut className="w-3.5 h-3.5 text-rose-400" />
-                      Çıkış Yap / Giriş Ekranına Dön
+                      <LogOut className="w-4 h-4 text-rose-400" />
+                      <span>Çıkış Yap</span>
                     </button>
                     {isManager && (
                       <button
@@ -280,10 +254,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setShowUserDropdown(false);
                           onOpenLoginModal();
                         }}
-                        className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-2 py-1.5 rounded hover:bg-slate-700 transition-colors"
+                        className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-700 transition-colors"
                       >
-                        <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                        Yeni Restoran / Şube Ekle
+                        <Building2 className="w-4 h-4 text-slate-400" />
+                        <span>Yeni Şube Ekle</span>
                       </button>
                     )}
                   </div>

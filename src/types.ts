@@ -1,4 +1,4 @@
-export type Position = 'Waiter' | 'Chef' | 'Cashier' | 'Barista' | 'Kitchen staff';
+export type Position = 'Çalışan' | 'Waiter' | 'Chef' | 'Cashier' | 'Barista' | 'Kitchen staff';
 
 export type EmploymentType = 'Full-time' | 'Part-time';
 
@@ -13,6 +13,7 @@ export interface User {
   role: UserRole;
   restaurantId: string;
   employeeId?: string; // links user to employee record if role is Employee
+  password?: string;
 }
 
 export interface Restaurant {

@@ -46,7 +46,12 @@ interface ScheduleCalendarViewProps {
 
 const POSITIONS: Position[] = ['Waiter', 'Chef', 'Cashier', 'Barista', 'Kitchen staff'];
 
-const POSITION_STYLES: Record<Position, { card: string; pill: string; labelBg: string }> = {
+const POSITION_STYLES: Record<string, { card: string; pill: string; labelBg: string }> = {
+  Çalışan: {
+    card: 'bg-blue-50 border-l-4 border-blue-500 text-slate-900',
+    pill: 'bg-blue-100 text-blue-800 border-blue-200',
+    labelBg: 'bg-blue-50 border-blue-200 text-blue-800',
+  },
   Waiter: {
     card: 'bg-blue-50 border-l-4 border-blue-500 text-slate-900',
     pill: 'bg-blue-100 text-blue-800 border-blue-200',

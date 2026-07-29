@@ -14,6 +14,9 @@ import {
   BadgePercent,
   ChefHat,
   Briefcase,
+  Lock,
+  X,
+  AlertCircle,
 } from 'lucide-react';
 import { User as UserType, Employee, Position } from '../types';
 
@@ -27,6 +30,7 @@ interface AuthPortalProps {
     isSharedStaff: boolean;
     hourlyRate: number;
     maxWeeklyHours: number;
+    password: string;
   }) => void;
   onManagerLogin: (managerUser: UserType) => void;
   users: UserType[];
@@ -45,19 +49,41 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
   // Employee Registration Form State
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
   const [regPhone, setRegPhone] = useState('');
-  const [regPosition, setRegPosition] = useState<Position>('Waiter');
+  const [regPosition, setRegPosition] = useState<Position>('Çalışan');
   const [regIsShared, setRegIsShared] = useState(true);
   const [regHourlyRate, setRegHourlyRate] = useState<number>(18);
   const [regMaxHours, setRegMaxHours] = useState<number>(38);
   const [regSuccessMsg, setRegSuccessMsg] = useState(false);
+  const [regErrorMsg, setRegErrorMsg] = useState('');
 
-  // Employee Quick Login State
-  const [selectedEmpId, setSelectedEmpId] = useState<string>(employees[0]?.id || '');
+  // Employee Login State
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  // Quick Employee Password Modal State
+  const [empModalTarget, setEmpModalTarget] = useState<Employee | null>(null);
+  const [empModalPassword, setEmpModalPassword] = useState('');
+  const [empModalError, setEmpModalError] = useState('');
+
+  // Manager Password Protection State
+  const [isManagerPasswordModalOpen, setIsManagerPasswordModalOpen] = useState(false);
+  const [managerPassword, setManagerPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regName || !regEmail) return;
+    setRegErrorMsg('');
+    if (!regName || !regEmail || !regPassword) {
+      setRegErrorMsg('Lütfen ad, e-posta ve şifre alanlarını doldurunuz.');
+      return;
+    }
+    if (regPassword.length < 4) {
+      setRegErrorMsg('Şifre en az 4 karakter olmalıdır.');
+      return;
+    }
 
     onEmployeeRegister({
       name: regName,
@@ -67,6 +93,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
       isSharedStaff: regIsShared,
       hourlyRate: Number(regHourlyRate),
       maxWeeklyHours: Number(regMaxHours),
+      password: regPassword,
     });
 
     setRegSuccessMsg(true);
@@ -76,19 +103,77 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
     }, 1500);
   };
 
-  const handleQuickEmployeeLogin = (emp: Employee) => {
-    const matchedUser = users.find((u) => u.email.toLowerCase() === emp.email.toLowerCase()) || {
-      id: `usr-${emp.id}`,
-      name: emp.name,
-      email: emp.email,
-      role: 'Employee' as const,
-      employeeId: emp.id,
-      restaurantId: 'rest-1',
-    };
+  const handleDirectEmployeeLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+
+    if (!loginEmail || !loginPassword) {
+      setLoginError('E-posta ve şifre girilmesi zorunludur.');
+      return;
+    }
+
+    const matchedUser = users.find((u) => u.email.toLowerCase() === loginEmail.trim().toLowerCase());
+
+    if (!matchedUser) {
+      setLoginError('Bu e-posta adresi ile kayıtlı çalışan bulunamadı.');
+      return;
+    }
+
+    const validPassword = matchedUser.password || '123456';
+    if (loginPassword !== validPassword) {
+      setLoginError('Hatalı şifre! Lütfen şifrenizi kontrol edip tekrar deneyin.');
+      return;
+    }
+
     onEmployeeLogin(matchedUser);
   };
 
+  const handleQuickEmpClick = (emp: Employee) => {
+    setEmpModalTarget(emp);
+    setEmpModalPassword('');
+    setEmpModalError('');
+  };
+
+  const handleEmpModalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!empModalTarget) return;
+
+    const matchedUser = users.find((u) => u.email.toLowerCase() === empModalTarget.email.toLowerCase()) || {
+      id: `usr-${empModalTarget.id}`,
+      name: empModalTarget.name,
+      email: empModalTarget.email,
+      role: 'Employee' as const,
+      employeeId: empModalTarget.id,
+      restaurantId: 'rest-1',
+      password: '123456',
+    };
+
+    const validPassword = matchedUser.password || '123456';
+    if (empModalPassword === validPassword) {
+      setEmpModalTarget(null);
+      onEmployeeLogin(matchedUser);
+    } else {
+      setEmpModalError('Hatalı şifre! (Varsayılan şifre: 123456)');
+    }
+  };
+
   const managerUser = users.find((u) => u.role === 'Manager') || users[0];
+
+  const handleOpenManagerPasswordModal = () => {
+    setManagerPassword('');
+    setPasswordError('');
+    setIsManagerPasswordModalOpen(true);
+  };
+
+  const handleManagerPasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (managerPassword === 'serkan1907') {
+      setIsManagerPasswordModalOpen(false);
+      onManagerLogin(managerUser);
+    } else {
+      setPasswordError('Hatalı şifre! Lütfen yöneticinize danışın.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between relative overflow-hidden font-sans">
@@ -106,15 +191,15 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             <h1 className="font-extrabold text-xl tracking-tight text-white flex items-center gap-2">
               StaffSync Pro
               <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-mono font-medium">
-                2 Restoran Ortak Portalı
+                Vardiya Portalı
               </span>
             </h1>
-            <p className="text-xs text-slate-400">Bistro Bella & Trattoria Milano Vardiya Portalı</p>
+            <p className="text-xs text-slate-400">Çalışan Vardiya ve Müsaitlik Portalı</p>
           </div>
         </div>
 
         <button
-          onClick={() => onManagerLogin(managerUser)}
+          onClick={handleOpenManagerPasswordModal}
           className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer"
         >
           <ShieldCheck className="w-4 h-4 text-blue-400" />
@@ -137,7 +222,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
             </h2>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Bistro Bella ve Trattoria Milano restoranlarında görev alan çalışanlar için hazırlanmış ortak vardiya bildirimi platformudur.
+              Restoran şubelerinde görev alan çalışanlar için hazırlanmış ortak vardiya bildirimi platformudur.
             </p>
 
             <div className="space-y-3 pt-2">
@@ -152,8 +237,8 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
               <div className="flex items-start gap-3 bg-slate-800/50 p-3 rounded-2xl border border-slate-800">
                 <Building2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                 <div className="text-xs">
-                  <div className="font-bold text-white">2 Restoran (Ottensen & Altona) Tercihi</div>
-                  <div className="text-slate-400">Bistro Bella veya Trattoria Milano şubelerindeki müsaitliğinizi bildirin.</div>
+                  <div className="font-bold text-white">Şube Tercihi</div>
+                  <div className="text-slate-400">Çalışabileceğiniz şubelerdeki müsaitliğinizi bildirin.</div>
                 </div>
               </div>
 
@@ -168,7 +253,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           </div>
 
           <div className="pt-6 border-t border-slate-800/80 mt-6 flex items-center justify-between text-xs text-slate-400">
-            <span>Standort Ottensen & Altona</span>
+            <span>Şube Vardiya Sistemi</span>
             <span className="font-mono text-blue-400">v2.4 Shared-Staff System</span>
           </div>
         </div>
@@ -210,67 +295,95 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 <div>
                   <h3 className="text-xl font-extrabold text-slate-900">Çalışan Hesabına Giriş Yap</h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Müsaitlik durumunuzu ve vardiya tercihlerinizi girmek için profilinizi seçin veya e-posta ile giriş yapın.
+                    Müsaitlik durumunuzu ve vardiya tercihlerinizi girmek için hesabınızla veya profilinizi seçerek giriş yapın.
                   </p>
                 </div>
 
-                {/* Direct Demo Account Buttons */}
-                <div className="space-y-2">
+                {/* Direct Email & Password Login Form */}
+                <form onSubmit={handleDirectEmployeeLogin} className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mb-1">
+                    <LogIn className="w-4 h-4 text-blue-600" />
+                    <span>E-posta ve Şifre ile Giriş:</span>
+                  </div>
+
+                  {loginError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
+                      <span>{loginError}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">E-posta Adresi:</label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="calisan@restoran.com"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          setLoginError('');
+                        }}
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">Şifre:</label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="password"
+                        required
+                        placeholder="••••••••"
+                        value={loginPassword}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          setLoginError('');
+                        }}
+                        className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>Giriş Yap</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </form>
+
+                {/* Direct Quick Account Selection */}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    Kayıtlı Çalışan Listesinden Seçerek Hızlı Giriş Yap:
+                    Veya Kayıtlı Çalışan Profilini Seç:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                     {employees.map((emp) => (
                       <button
                         key={emp.id}
                         type="button"
-                        onClick={() => handleQuickEmployeeLogin(emp)}
+                        onClick={() => handleQuickEmpClick(emp)}
                         className="p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50 hover:border-blue-300 text-left transition-all flex items-center justify-between group cursor-pointer"
                       >
                         <div>
-                          <div className="font-bold text-slate-900 text-xs group-hover:text-blue-700">
-                            {emp.name}
+                          <div className="font-bold text-slate-900 text-xs group-hover:text-blue-700 flex items-center gap-1">
+                            <span>{emp.name}</span>
+                            <Lock className="w-3 h-3 text-slate-400" />
                           </div>
                           <div className="text-[10px] text-slate-500">
-                            {emp.position} • {emp.isSharedStaff ? 'Ortak Çalışan' : 'Garson'}
+                            Çalışan
                           </div>
                         </div>
                         <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
                       </button>
                     ))}
                   </div>
-                </div>
-
-                {/* Email Login Input */}
-                <div className="pt-3 border-t border-slate-100 space-y-3">
-                  <label className="block text-xs font-semibold text-slate-700">Veya E-posta Adresinizle Giriş Yapın:</label>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const targetEmp = employees.find((emp) => emp.email.toLowerCase() === regEmail.toLowerCase());
-                      if (targetEmp) {
-                        handleQuickEmployeeLogin(targetEmp);
-                      } else if (employees.length > 0) {
-                        handleQuickEmployeeLogin(employees[0]);
-                      }
-                    }}
-                    className="flex gap-2"
-                  >
-                    <input
-                      type="email"
-                      required
-                      placeholder="calisan@restoran.com"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-600"
-                    />
-                    <button
-                      type="submit"
-                      className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer"
-                    >
-                      Giriş Yap
-                    </button>
-                  </form>
                 </div>
               </div>
             )}
@@ -281,14 +394,21 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                 <div>
                   <h3 className="text-xl font-extrabold text-slate-900">Yeni Çalışan Kaydı</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Restoran ekibine katılın ve haftalık vardiya isteklerinizi girmeye başlayın.
+                    Restoran ekibine katılın ve şifrenizle hemen haftalık vardiya isteklerinizi girmeye başlayın.
                   </p>
                 </div>
 
                 {regSuccessMsg && (
                   <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Kaydınız tamamlandı! Giriş ekranına yönlendiriliyorsunuz...</span>
+                    <span>Kaydınız başarıyla tamamlandı! Giriş ekranına yönlendiriliyorsunuz...</span>
+                  </div>
+                )}
+
+                {regErrorMsg && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-xl flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
+                    <span>{regErrorMsg}</span>
                   </div>
                 )}
 
@@ -325,6 +445,23 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                     </div>
 
                     <div>
+                      <label className="block font-semibold text-slate-700 mb-1">Şifre Belirleyin (Password):</label>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                        <input
+                          type="password"
+                          required
+                          placeholder="En az 4 karakter"
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-blue-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
                       <label className="block font-semibold text-slate-700 mb-1">Telefon Numarası:</label>
                       <div className="relative">
                         <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -337,9 +474,7 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                         />
                       </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block font-semibold text-slate-700 mb-1">Görev / Pozisyon:</label>
                       <select
@@ -355,43 +490,27 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
                         <option value="Host">Karşılama / Host</option>
                       </select>
                     </div>
-
-                    <div>
-                      <label className="block font-semibold text-slate-700 mb-1">Maks. Haftalık Saat:</label>
-                      <input
-                        type="number"
-                        min={10}
-                        max={60}
-                        value={regMaxHours}
-                        onChange={(e) => setRegMaxHours(Number(e.target.value))}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600"
-                      />
-                    </div>
                   </div>
 
-                  {/* Shared Staff Checkbox */}
-                  <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={regIsShared}
-                        onChange={(e) => setRegIsShared(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
-                      />
-                      <span className="font-bold text-slate-800 text-xs">
-                        2 Restoranda Da Çalışabilirim (Bistro Bella + Trattoria Milano)
-                      </span>
-                    </label>
-                    <p className="text-[10px] text-slate-500 mt-1 pl-6">
-                      İşaretlendiğinde profiliniz her iki restoranın ortak vardiya planına eklenir.
-                    </p>
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">Maks. Haftalık Hedef Saat:</label>
+                    <input
+                      type="number"
+                      min={10}
+                      max={60}
+                      value={regMaxHours}
+                      onChange={(e) => setRegMaxHours(Number(e.target.value))}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-blue-600"
+                    />
                   </div>
+
+
 
                   <button
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
                   >
-                    <span>Kayıt Ol ve Müsaitlik Sayfasına Git</span>
+                    <span>Şifre ile Kayıt Ol ve Giriş Yap</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>
@@ -402,10 +521,11 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
           <div className="pt-4 mt-6 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
             <span>StaffSync Pro © 2026</span>
             <button
-              onClick={() => onManagerLogin(managerUser)}
-              className="text-blue-600 font-semibold hover:underline cursor-pointer"
+              onClick={handleOpenManagerPasswordModal}
+              className="text-blue-600 font-semibold hover:underline cursor-pointer flex items-center gap-1"
             >
-              Yönetici Paneline Geçiş Yap →
+              <Lock className="w-3 h-3" />
+              <span>Yönetici Paneline Geçiş Yap →</span>
             </button>
           </div>
         </div>
@@ -413,8 +533,151 @@ export const AuthPortal: React.FC<AuthPortalProps> = ({
 
       {/* Footer */}
       <footer className="w-full max-w-7xl mx-auto px-6 py-4 text-center text-xs text-slate-500 border-t border-slate-900/60 z-10">
-        Bistro Bella (Ottensen) & Trattoria Milano (Altona) Ortak Vardiya Planlama ve Otomatik Çizelge Portalı.
+        Ortak Vardiya Planlama ve Otomatik Çizelge Portalı.
       </footer>
+
+      {/* QUICK EMPLOYEE PASSWORD MODAL OVERLAY */}
+      {empModalTarget && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setEmpModalTarget(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-white">{empModalTarget.name}</h3>
+                <p className="text-xs text-slate-400">{empModalTarget.email} • Şifrenizi girin</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleEmpModalSubmit} className="space-y-4">
+              {empModalError && (
+                <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                  <span>{empModalError}</span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">
+                  Çalışan Şifresi:
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <input
+                    type="password"
+                    autoFocus
+                    required
+                    placeholder="••••••••"
+                    value={empModalPassword}
+                    onChange={(e) => {
+                      setEmpModalPassword(e.target.value);
+                      setEmpModalError('');
+                    }}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1">Varsayılan demo çalışan şifresi: <code className="text-blue-400 font-mono">123456</code></p>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEmpModalTarget(null)}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Giriş Yap</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MANAGER PASSWORD MODAL OVERLAY */}
+      {isManagerPasswordModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsManagerPasswordModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-extrabold text-white">Yönetici Giriş Doğrulaması</h3>
+                <p className="text-xs text-slate-400">Manager Portal erişimi için şifreyi giriniz</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleManagerPasswordSubmit} className="space-y-4">
+              {passwordError && (
+                <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-semibold rounded-xl flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                  <span>{passwordError}</span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">
+                  Yönetici Şifresi (Manager Password):
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <input
+                    type="password"
+                    autoFocus
+                    required
+                    placeholder="••••••••"
+                    value={managerPassword}
+                    onChange={(e) => {
+                      setManagerPassword(e.target.value);
+                      setPasswordError('');
+                    }}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white font-medium focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsManagerPasswordModalOpen(false)}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold py-2.5 rounded-xl transition-all cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold py-2.5 rounded-xl shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Giriş Yap</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
