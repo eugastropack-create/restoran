@@ -7,10 +7,10 @@ const currentMonday = startOfWeek(today, { weekStartsOn: 1 });
 export const INITIAL_RESTAURANTS: Restaurant[] = [
   {
     id: 'rest-1',
-    name: 'Restoran 1',
+    name: 'Altona',
     address: '742 Evergreen Terrace, Downtown',
     phone: '(555) 382-9100',
-    managerName: 'Sarah Jenkins',
+    managerName: 'Admin',
     currency: '$',
     openingHours: {
       Monday: { open: '08:00', close: '22:00' },
@@ -24,10 +24,10 @@ export const INITIAL_RESTAURANTS: Restaurant[] = [
   },
   {
     id: 'rest-2',
-    name: 'Restoran 2',
+    name: 'Ottensen',
     address: '128 Grand Avenue, Westside',
     phone: '(555) 948-2200',
-    managerName: 'Sarah Jenkins',
+    managerName: 'Admin',
     currency: '$',
     openingHours: {
       Monday: { open: '10:00', close: '23:00' },
@@ -47,7 +47,7 @@ export const INITIAL_USERS: User[] = [
   {
     id: 'usr-1',
     email: 'manager@bistro.com',
-    name: 'Sarah Jenkins',
+    name: 'Admin',
     role: 'Manager',
     restaurantId: 'rest-1',
     password: 'serkan1907',
@@ -499,7 +499,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-2', // Shared Chef Marco Rossi working evening at Restoran 2!
     isPublished: true,
     color: '#dc2626',
-    notes: 'Restoran 2 akşam vardiyası',
+    notes: 'Ottensen Spätschicht',
   },
   {
     id: 'shift-202',
@@ -511,7 +511,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-3', // Shared Cashier Elena Rostova at Restoran 2
     isPublished: true,
     color: '#d97706',
-    notes: 'Restoran 2 gündüz vardiyası',
+    notes: 'Ottensen Tagesschicht',
   },
   {
     id: 'shift-203',
@@ -523,7 +523,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-1', // Shared Waiter Alex Rivers
     isPublished: true,
     color: '#059669',
-    notes: 'Restoran 2 Cuma yoğun saatler',
+    notes: 'Ottensen Freitag Hauptzeit',
   },
   {
     id: 'shift-204',
@@ -535,7 +535,7 @@ export const INITIAL_SHIFTS: Shift[] = [
     assignedEmployeeId: 'emp-5', // Shared Kitchen Staff Maria Santos
     isPublished: true,
     color: '#7c3aed',
-    notes: 'Restoran 2 Cumartesi hazırlık & servis',
+    notes: 'Ottensen Samstag Vorbereitung & Service',
   },
 ];
 
@@ -555,7 +555,7 @@ export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
       Friday: 'rest-2',
       Saturday: 'rest-2',
     },
-    reason: 'Ortak çalışan: Hafta başında Restoran 1, Cuma-Cumartesi Restoran 2 şubesinde çalışabilirim.',
+    reason: 'Mitarbeiter: Anfang der Woche Altona, Freitag-Samstag in Ottensen verfügbar.',
     status: 'Pending',
     createdAt: new Date().toISOString(),
   },
@@ -573,7 +573,7 @@ export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
       Wednesday: 'rest-2',
       Friday: 'rest-2',
     },
-    reason: 'Müsaitlik güncellemesi: Çarşamba ve Cuma günleri Restoran 2 şubesinde kasa/barista nöbeti tercih ediyorum.',
+    reason: 'Verfügbarkeit: Mittwoch und Freitag bevorzuge ich Ottensen.',
     status: 'Approved',
     createdAt: new Date().toISOString(),
   },

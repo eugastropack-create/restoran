@@ -328,10 +328,13 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <tbody className="divide-y divide-slate-100 text-xs">
               {groupBy === 'LOCATION' ? (
                 // Grouped by Location (Standort - Restoran)
-                [
-                  { id: 'rest-1', name: 'Restoran 1', fullName: 'Restoran 1' },
-                  { id: 'rest-2', name: 'Restoran 2', fullName: 'Restoran 2' },
-                ].map((loc) => (
+                (restaurants && restaurants.length > 0
+                  ? restaurants.map((r) => ({ id: r.id, name: r.name, fullName: r.name }))
+                  : [
+                      { id: 'rest-1', name: 'Altona', fullName: 'Altona' },
+                      { id: 'rest-2', name: 'Ottensen', fullName: 'Ottensen' },
+                    ]
+                ).map((loc) => (
                   <tr key={loc.id} className="hover:bg-slate-50/50 transition-colors">
                     {/* Location Label Column */}
                     <td className="p-3 border-r border-slate-200 sticky left-0 bg-white font-bold text-slate-800 z-10">

@@ -1,0 +1,777 @@
+{
+  "restaurants": [
+    {
+      "id": "rest-1",
+      "name": "Altona",
+      "address": "742 Evergreen Terrace, Downtown",
+      "phone": "(555) 382-9100",
+      "managerName": "Admin",
+      "currency": "$",
+      "openingHours": {
+        "Monday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "Tuesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "Wednesday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "Thursday": {
+          "open": "08:00",
+          "close": "22:00"
+        },
+        "Friday": {
+          "open": "08:00",
+          "close": "23:30"
+        },
+        "Saturday": {
+          "open": "08:00",
+          "close": "23:30"
+        },
+        "Sunday": {
+          "open": "09:00",
+          "close": "21:00"
+        }
+      }
+    },
+    {
+      "id": "rest-2",
+      "name": "Ottensen",
+      "address": "128 Grand Avenue, Westside",
+      "phone": "(555) 948-2200",
+      "managerName": "Admin",
+      "currency": "$",
+      "openingHours": {
+        "Monday": {
+          "open": "10:00",
+          "close": "23:00"
+        },
+        "Tuesday": {
+          "open": "10:00",
+          "close": "23:00"
+        },
+        "Wednesday": {
+          "open": "10:00",
+          "close": "23:00"
+        },
+        "Thursday": {
+          "open": "10:00",
+          "close": "23:00"
+        },
+        "Friday": {
+          "open": "10:00",
+          "close": "00:00"
+        },
+        "Saturday": {
+          "open": "10:00",
+          "close": "00:00"
+        },
+        "Sunday": {
+          "open": "10:00",
+          "close": "22:00"
+        }
+      }
+    }
+  ],
+  "restaurant": {
+    "id": "rest-1",
+    "name": "Altona",
+    "address": "742 Evergreen Terrace, Downtown",
+    "phone": "(555) 382-9100",
+    "managerName": "Admin",
+    "currency": "$",
+    "openingHours": {
+      "Monday": {
+        "open": "08:00",
+        "close": "22:00"
+      },
+      "Tuesday": {
+        "open": "08:00",
+        "close": "22:00"
+      },
+      "Wednesday": {
+        "open": "08:00",
+        "close": "22:00"
+      },
+      "Thursday": {
+        "open": "08:00",
+        "close": "22:00"
+      },
+      "Friday": {
+        "open": "08:00",
+        "close": "23:30"
+      },
+      "Saturday": {
+        "open": "08:00",
+        "close": "23:30"
+      },
+      "Sunday": {
+        "open": "09:00",
+        "close": "21:00"
+      }
+    }
+  },
+  "users": [
+    {
+      "id": "usr-1",
+      "email": "manager@bistro.com",
+      "name": "Admin",
+      "role": "Manager",
+      "restaurantId": "rest-1"
+    },
+    {
+      "id": "usr-2",
+      "email": "alex.rivers@bistro.com",
+      "name": "Alex Rivers",
+      "role": "Employee",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1"
+    },
+    {
+      "id": "usr-3",
+      "email": "marco.rossi@bistro.com",
+      "name": "Marco Rossi",
+      "role": "Employee",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-2"
+    },
+    {
+      "id": "usr-4",
+      "email": "elena.rostova@bistro.com",
+      "name": "Elena Rostova",
+      "role": "Employee",
+      "restaurantId": "rest-2",
+      "employeeId": "emp-3"
+    }
+  ],
+  "employees": [],
+  "shifts": [
+    {
+      "id": "shift-101",
+      "restaurantId": "rest-1",
+      "date": "2026-07-27",
+      "startTime": "08:00",
+      "endTime": "16:00",
+      "position": "Barista",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#3b82f6",
+      "notes": "Morning coffee rush & prep"
+    },
+    {
+      "id": "shift-102",
+      "restaurantId": "rest-1",
+      "date": "2026-07-27",
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444",
+      "notes": "Lunch service lead"
+    },
+    {
+      "id": "shift-103",
+      "restaurantId": "rest-1",
+      "date": "2026-07-27",
+      "startTime": "11:00",
+      "endTime": "19:00",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981",
+      "notes": "Main floor seating"
+    },
+    {
+      "id": "shift-104",
+      "restaurantId": "rest-1",
+      "date": "2026-07-27",
+      "startTime": "12:00",
+      "endTime": "20:00",
+      "position": "Kitchen staff",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "shift-105",
+      "restaurantId": "rest-1",
+      "date": "2026-07-28",
+      "startTime": "08:00",
+      "endTime": "16:00",
+      "position": "Barista",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "shift-106",
+      "restaurantId": "rest-1",
+      "date": "2026-07-28",
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "shift-107",
+      "restaurantId": "rest-1",
+      "date": "2026-07-28",
+      "startTime": "11:00",
+      "endTime": "19:00",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-108",
+      "restaurantId": "rest-1",
+      "date": "2026-07-29",
+      "startTime": "08:00",
+      "endTime": "16:00",
+      "position": "Cashier",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "shift-109",
+      "restaurantId": "rest-1",
+      "date": "2026-07-29",
+      "startTime": "12:00",
+      "endTime": "20:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "shift-110",
+      "restaurantId": "rest-1",
+      "date": "2026-07-29",
+      "startTime": "12:00",
+      "endTime": "20:00",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-111",
+      "restaurantId": "rest-1",
+      "date": "2026-07-30",
+      "startTime": "08:00",
+      "endTime": "16:00",
+      "position": "Barista",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "shift-112",
+      "restaurantId": "rest-1",
+      "date": "2026-07-30",
+      "startTime": "15:00",
+      "endTime": "23:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "shift-113",
+      "restaurantId": "rest-1",
+      "date": "2026-07-30",
+      "startTime": "16:00",
+      "endTime": "23:00",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-114",
+      "restaurantId": "rest-1",
+      "date": "2026-07-31",
+      "startTime": "16:00",
+      "endTime": "23:30",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444",
+      "notes": "Friday dinner service"
+    },
+    {
+      "id": "shift-115",
+      "restaurantId": "rest-1",
+      "date": "2026-07-31",
+      "startTime": "16:00",
+      "endTime": "23:30",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-116",
+      "restaurantId": "rest-1",
+      "date": "2026-07-31",
+      "startTime": "17:00",
+      "endTime": "23:30",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-117",
+      "restaurantId": "rest-1",
+      "date": "2026-07-31",
+      "startTime": "17:00",
+      "endTime": "23:30",
+      "position": "Cashier",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "shift-118",
+      "restaurantId": "rest-1",
+      "date": "2026-07-31",
+      "startTime": "16:00",
+      "endTime": "23:30",
+      "position": "Kitchen staff",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "shift-119",
+      "restaurantId": "rest-1",
+      "date": "2026-08-01",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "position": "Barista",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "shift-120",
+      "restaurantId": "rest-1",
+      "date": "2026-08-01",
+      "startTime": "15:00",
+      "endTime": "23:30",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "shift-121",
+      "restaurantId": "rest-1",
+      "date": "2026-08-01",
+      "startTime": "16:00",
+      "endTime": "23:30",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#10b981"
+    },
+    {
+      "id": "shift-122",
+      "restaurantId": "rest-1",
+      "date": "2026-08-02",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#ef4444"
+    },
+    {
+      "id": "shift-123",
+      "restaurantId": "rest-1",
+      "date": "2026-08-02",
+      "startTime": "10:00",
+      "endTime": "18:00",
+      "position": "Kitchen staff",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "shift-124",
+      "restaurantId": "rest-1",
+      "date": "2026-08-02",
+      "startTime": "12:00",
+      "endTime": "20:00",
+      "position": "Cashier",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "shift-201",
+      "restaurantId": "rest-2",
+      "date": "2026-07-27",
+      "startTime": "16:00",
+      "endTime": "23:00",
+      "position": "Chef",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#dc2626",
+      "notes": "Ottensen Spätschicht"
+    },
+    {
+      "id": "shift-202",
+      "restaurantId": "rest-2",
+      "date": "2026-07-29",
+      "startTime": "11:00",
+      "endTime": "19:00",
+      "position": "Cashier",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#d97706",
+      "notes": "Ottensen Tagesschicht"
+    },
+    {
+      "id": "shift-203",
+      "restaurantId": "rest-2",
+      "date": "2026-07-31",
+      "startTime": "17:00",
+      "endTime": "23:30",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#059669",
+      "notes": "Ottensen Freitag Hauptzeit"
+    },
+    {
+      "id": "shift-204",
+      "restaurantId": "rest-2",
+      "date": "2026-08-01",
+      "startTime": "12:00",
+      "endTime": "20:00",
+      "position": "Kitchen staff",
+      "assignedEmployeeId": null,
+      "isPublished": true,
+      "color": "#7c3aed",
+      "notes": "Ottensen Samstag Vorbereitung & Service"
+    },
+    {
+      "id": "shift-1785329651262awdy",
+      "restaurantId": "rest-1",
+      "date": "2026-07-29",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "position": "Waiter",
+      "assignedEmployeeId": null,
+      "notes": "",
+      "isPublished": false,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "shift-1785332361717gln8",
+      "restaurantId": "rest-1",
+      "date": "2026-08-03",
+      "startTime": "09:00",
+      "endTime": "17:00",
+      "position": "Waiter",
+      "assignedEmployeeId": "emp-1785332230531",
+      "notes": "",
+      "isPublished": false,
+      "color": "#3b82f6"
+    }
+  ],
+  "requests": [
+    {
+      "id": "req-1785333857641",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785333839376",
+      "employeeName": "a (Gemeinsamer Mitarbeiter)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [],
+      "requestedMaxHours": 38,
+      "reason": "Verfügbarkeitsmeldung für 3. Woche (In 2 Wochen) aktualisiert.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T14:04:17.641Z"
+    },
+    {
+      "id": "req-1785333857638",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785333839376",
+      "employeeName": "a (Gemeinsamer Mitarbeiter)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [],
+      "requestedMaxHours": 38,
+      "reason": "Verfügbarkeitsmeldung für 2. Woche (Nächste Woche) aktualisiert.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T14:04:17.638Z"
+    },
+    {
+      "id": "req-1785333857635",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785333839376",
+      "employeeName": "a (Gemeinsamer Mitarbeiter)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [],
+      "requestedMaxHours": 38,
+      "reason": "Verfügbarkeitsmeldung für 1. Woche (Diese Woche) aktualisiert.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T14:04:17.635Z"
+    },
+    {
+      "id": "req-1785332724083",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332705407",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [
+        "Thursday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "2. Hafta (Gelecek Hafta) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:45:24.083Z"
+    },
+    {
+      "id": "req-1785332724080",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332705407",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [],
+      "requestedMaxHours": 38,
+      "reason": "1. Hafta (Bu Hafta) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:45:24.080Z"
+    },
+    {
+      "id": "req-1785332724078",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332705407",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [],
+      "requestedMaxHours": 38,
+      "reason": "3. Hafta (2 Hafta Sonra) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:45:24.078Z"
+    },
+    {
+      "id": "req-1785332297554",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332230531",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [
+        "Monday",
+        "Saturday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "3. Hafta (2 Hafta Sonra) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:38:17.554Z"
+    },
+    {
+      "id": "req-1785332296135",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332230531",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [
+        "Monday",
+        "Saturday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "3. Hafta (2 Hafta Sonra) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:38:16.135Z"
+    },
+    {
+      "id": "req-1785332292437",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332230531",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Tuesday",
+        "Wednesday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [
+        "Monday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "2. Hafta (Gelecek Hafta) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:38:12.438Z"
+    },
+    {
+      "id": "req-1785332290092",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785332230531",
+      "employeeName": "a (Ortak Çalışan)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "requestedUnavailableDays": [
+        "Sunday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "1. Hafta (Bu Hafta) için müsaitlik bildirimi güncellendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:38:10.092Z"
+    },
+    {
+      "id": "req-1785330156158",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1785330125247",
+      "employeeName": "kemal cakiroglu (Ortak Çalışan / Shared Staff)",
+      "requestedAvailableDays": [
+        "Monday"
+      ],
+      "requestedUnavailableDays": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedMaxHours": 38,
+      "reason": "Müsaitlik güncellemesi: 2 restoran ortak şube çalışma günleri belirlendi.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T13:02:36.158Z"
+    },
+    {
+      "id": "req-1",
+      "restaurantId": "rest-1",
+      "employeeId": "emp-1",
+      "employeeName": "Alex Rivers (Ortak Çalışan / Shared Staff)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "requestedUnavailableDays": [
+        "Sunday"
+      ],
+      "requestedMaxHours": 38,
+      "preferredRestaurantId": "ALL",
+      "dayRestaurantPreferences": {
+        "Monday": "rest-1",
+        "Wednesday": "rest-1",
+        "Friday": "rest-2",
+        "Saturday": "rest-2"
+      },
+      "reason": "Mitarbeiter: Anfang der Woche Altona, Freitag-Samstag in Ottensen verfügbar.",
+      "status": "Pending",
+      "createdAt": "2026-07-29T12:52:56.121Z"
+    },
+    {
+      "id": "req-2",
+      "restaurantId": "rest-2",
+      "employeeId": "emp-3",
+      "employeeName": "Elena Rostova (Ortak Çalışan / Shared Staff)",
+      "requestedAvailableDays": [
+        "Monday",
+        "Wednesday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "requestedUnavailableDays": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "requestedMaxHours": 25,
+      "preferredRestaurantId": "rest-2",
+      "dayRestaurantPreferences": {
+        "Monday": "rest-1",
+        "Wednesday": "rest-2",
+        "Friday": "rest-2"
+      },
+      "reason": "Verfügbarkeit: Mittwoch und Freitag bevorzuge ich Ottensen.",
+      "status": "Approved",
+      "createdAt": "2026-07-29T12:52:56.121Z"
+    }
+  ]
+}

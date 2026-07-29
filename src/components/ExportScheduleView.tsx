@@ -81,8 +81,8 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
 
   // Locations to display as Standort rows
   const locations = [
-    { id: 'rest-1', name: 'Restoran 1', fullName: 'Restoran 1' },
-    { id: 'rest-2', name: 'Restoran 2', fullName: 'Restoran 2' },
+    { id: 'rest-1', name: 'Altona', fullName: 'Altona' },
+    { id: 'rest-2', name: 'Ottensen', fullName: 'Ottensen' },
   ];
 
   // Day Header Color Palette matching the photo exact colors
@@ -381,7 +381,7 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
                                   className="bg-blue-50 border border-blue-200 text-slate-900 p-1.5 rounded text-[11px] font-bold space-y-0.5"
                                 >
                                   <div className="text-[9px] text-blue-700 uppercase font-extrabold">
-                                    {s.restaurantId === 'rest-2' ? 'Restoran 2' : 'Restoran 1'}
+                                    {s.restaurantId === 'rest-2' ? 'Ottensen' : 'Altona'}
                                   </div>
                                   <div>
                                     {s.startTime} - {s.endTime}

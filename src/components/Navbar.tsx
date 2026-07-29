@@ -7,7 +7,6 @@ import {
   Printer,
   Sparkles,
   UserCheck,
-  Building2,
   LogOut,
   ChevronDown,
 } from 'lucide-react';
@@ -231,18 +230,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <LogOut className="w-4 h-4 text-rose-400" />
                       <span>Abmelden</span>
                     </button>
-                    {isManager && (
-                      <button
-                        onClick={() => {
-                          setShowUserDropdown(false);
-                          onOpenLoginModal();
-                        }}
-                        className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-700 transition-colors"
-                      >
-                        <Building2 className="w-4 h-4 text-slate-400" />
-                        <span>Neues Restaurant hinzufügen</span>
-                      </button>
-                    )}
+                    {/* Removed 'Neues Restaurant hinzufügen' button per user request */}
                   </div>
                 </div>
               )}

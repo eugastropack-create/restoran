@@ -98,7 +98,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="z.B. Restoran 1"
+                    placeholder="z.B. Altona"
                     value={restaurantName}
                     onChange={(e) => setRestaurantName(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-blue-500"
@@ -113,7 +113,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="z.B. Sarah Jenkins"
+                    placeholder="z.B. Admin"
                     value={managerName}
                     onChange={(e) => setManagerName(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-blue-500"

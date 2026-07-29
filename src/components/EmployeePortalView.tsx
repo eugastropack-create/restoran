@@ -70,8 +70,8 @@ export const EmployeePortalView: React.FC<EmployeePortalViewProps> = ({
   const getRestaurantName = (restId: string) => {
     const found = restaurants.find((r) => r.id === restId);
     if (found) return found.name;
-    if (restId === 'rest-2') return 'Restoran 2';
-    return restaurant?.name || 'Restoran 1';
+    if (restId === 'rest-2') return 'Ottensen';
+    return restaurant?.name || 'Altona';
   };
 
   return (
