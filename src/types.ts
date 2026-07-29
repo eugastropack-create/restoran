@@ -27,7 +27,9 @@ export interface Restaurant {
 
 export interface Employee {
   id: string;
-  restaurantId: string;
+  restaurantId: string; // Primary restaurant ID
+  assignedRestaurants?: string[]; // Restaurant IDs where employee can be scheduled (e.g. ['rest-1', 'rest-2'])
+  isSharedStaff?: boolean; // Flag for shared employees working across 2 restaurants
   name: string;
   email: string;
   phone: string;
@@ -44,7 +46,7 @@ export interface Employee {
 
 export interface Shift {
   id: string;
-  restaurantId: string;
+  restaurantId: string; // 'rest-1' or 'rest-2'
   date: string; // YYYY-MM-DD
   startTime: string; // HH:mm (24h)
   endTime: string; // HH:mm (24h)
@@ -63,6 +65,8 @@ export interface AvailabilityRequest {
   requestedAvailableDays: DayOfWeek[];
   requestedUnavailableDays: DayOfWeek[];
   requestedMaxHours: number;
+  preferredRestaurantId?: string; // 'rest-1', 'rest-2', or 'ALL'
+  dayRestaurantPreferences?: Partial<Record<DayOfWeek, string>>; // e.g. { Monday: 'rest-1', Friday: 'rest-2' }
   reason?: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   createdAt: string;

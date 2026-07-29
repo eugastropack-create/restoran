@@ -9,8 +9,10 @@ import { AvailabilityRequestsView } from './components/AvailabilityRequestsView'
 import { EmployeePortalView } from './components/EmployeePortalView';
 import { ExportScheduleView } from './components/ExportScheduleView';
 import { LoginModal } from './components/LoginModal';
+import { AuthPortal } from './components/AuthPortal';
 import { api } from './lib/api';
 import {
+  INITIAL_RESTAURANTS,
   INITIAL_RESTAURANT,
   INITIAL_USERS,
   INITIAL_EMPLOYEES,
@@ -31,8 +33,10 @@ import {
 import { CheckCircle2, AlertCircle, X } from 'lucide-react';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(INITIAL_USERS[0]); // Manager by default
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(INITIAL_RESTAURANT);
+  const [currentUser, setCurrentUser] = useState<User | null>(null); // Starts at AuthPortal Landing Page
+  const [restaurants, setRestaurants] = useState<Restaurant[]>(INITIAL_RESTAURANTS);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(INITIAL_RESTAURANTS[0]);
+  const [selectedRestaurantFilter, setSelectedRestaurantFilter] = useState<string>('ALL');
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);
   const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
   const [shifts, setShifts] = useState<Shift[]>(INITIAL_SHIFTS);
@@ -40,7 +44,7 @@ export default function App() {
     INITIAL_AVAILABILITY_REQUESTS
   );
 
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('requests');
 
   // Modals state
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
@@ -68,13 +72,15 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [restData, empData, shiftData, reqData] = await Promise.all([
+        const [restsData, restData, empData, shiftData, reqData] = await Promise.all([
+          api.getRestaurants().catch(() => INITIAL_RESTAURANTS),
           api.getRestaurant().catch(() => INITIAL_RESTAURANT),
           api.getEmployees().catch(() => INITIAL_EMPLOYEES),
           api.getShifts().catch(() => INITIAL_SHIFTS),
           api.getAvailabilityRequests().catch(() => INITIAL_AVAILABILITY_REQUESTS),
         ]);
 
+        if (restsData && restsData.length > 0) setRestaurants(restsData);
         if (restData) setRestaurant(restData);
         if (empData) setEmployees(empData);
         if (shiftData) setShifts(shiftData);
@@ -391,11 +397,86 @@ export default function App() {
     if (found) {
       handleSwitchUser(found);
     } else {
-      showToast('User email not found. Try manager@bistro.com', 'error');
+      showToast('User email not found.', 'error');
     }
   };
 
+  const handleEmployeeLogin = (user: User) => {
+    setCurrentUser(user);
+    if (user.role === 'Employee') {
+      setActiveTab('requests');
+    } else {
+      setActiveTab('dashboard');
+    }
+    showToast(`Hoş geldiniz ${user.name}! Vardiya isteklerinizi girebilirsiniz.`);
+  };
+
+  const handleEmployeeRegister = (empData: {
+    name: string;
+    email: string;
+    phone: string;
+    position: Position;
+    isSharedStaff: boolean;
+    hourlyRate: number;
+    maxWeeklyHours: number;
+  }) => {
+    const newEmpId = `emp-${Date.now()}`;
+    const newEmp: Employee = {
+      id: newEmpId,
+      restaurantId: 'rest-1',
+      assignedRestaurants: empData.isSharedStaff ? ['rest-1', 'rest-2'] : ['rest-1'],
+      isSharedStaff: empData.isSharedStaff,
+      name: empData.name,
+      email: empData.email,
+      phone: empData.phone,
+      position: empData.position,
+      employmentType: 'Full-time',
+      hourlyRate: empData.hourlyRate,
+      maxWeeklyHours: empData.maxWeeklyHours,
+      availableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      unavailableDays: [],
+      status: 'Active',
+    };
+
+    const newUser: User = {
+      id: `usr-${newEmpId}`,
+      name: empData.name,
+      email: empData.email,
+      role: 'Employee',
+      employeeId: newEmpId,
+      restaurantId: 'rest-1',
+    };
+
+    setEmployees((prev) => [newEmp, ...prev]);
+    setUsers((prev) => [newUser, ...prev]);
+    setCurrentUser(newUser);
+    setActiveTab('requests');
+    showToast(`Kayıt tamamlandı! ${empData.name} olarak vardiya isteklerinizi belirtebilirsiniz.`);
+  };
+
+  const handleSignOut = () => {
+    setCurrentUser(null);
+    showToast('Oturum kapatıldı.');
+  };
+
   const currentEmp = employees.find((e) => e.id === currentUser?.employeeId) || null;
+
+  // Render AuthPortal when no user is logged in
+  if (!currentUser) {
+    return (
+      <AuthPortal
+        onEmployeeLogin={handleEmployeeLogin}
+        onEmployeeRegister={handleEmployeeRegister}
+        onManagerLogin={(managerUser) => {
+          setCurrentUser(managerUser);
+          setActiveTab('dashboard');
+          showToast(`Yönetici Girişi Yapıldı (${managerUser.name})`);
+        }}
+        users={users}
+        employees={employees}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased flex flex-col">
@@ -429,12 +510,16 @@ export default function App() {
       <Navbar
         currentUser={currentUser}
         restaurant={restaurant}
+        restaurants={restaurants}
+        selectedRestaurantFilter={selectedRestaurantFilter}
+        onSelectRestaurantFilter={setSelectedRestaurantFilter}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         users={users}
         onSwitchUser={handleSwitchUser}
         onOpenAutoScheduler={() => setIsAutoSchedulerOpen(true)}
         onOpenLoginModal={() => setIsLoginModalOpen(true)}
+        onSignOut={handleSignOut}
       />
 
       {/* Main Page Container */}
@@ -443,7 +528,7 @@ export default function App() {
           <DashboardView
             stats={calculateStats()}
             employees={employees}
-            shifts={shifts}
+            shifts={selectedRestaurantFilter === 'ALL' ? shifts : shifts.filter((s) => s.restaurantId === selectedRestaurantFilter)}
             availabilityRequests={availabilityRequests}
             onNavigateTab={setActiveTab}
             onOpenAutoScheduler={() => setIsAutoSchedulerOpen(true)}
@@ -454,8 +539,10 @@ export default function App() {
 
         {activeTab === 'schedule' && (
           <ScheduleCalendarView
-            shifts={shifts}
+            shifts={selectedRestaurantFilter === 'ALL' ? shifts : shifts.filter((s) => s.restaurantId === selectedRestaurantFilter)}
             employees={employees}
+            restaurants={restaurants}
+            selectedRestaurantId={selectedRestaurantFilter}
             onOpenAddShift={handleOpenAddShift}
             onOpenEditShift={handleOpenEditShift}
             onDeleteShift={handleDeleteShift}
@@ -480,6 +567,7 @@ export default function App() {
             requests={availabilityRequests}
             currentUser={currentUser}
             employees={employees}
+            restaurants={restaurants}
             onRequestSubmit={handleCreateAvailabilityRequest}
             onRequestStatusUpdate={handleUpdateAvailabilityRequestStatus}
           />
@@ -491,12 +579,13 @@ export default function App() {
             employee={currentEmp}
             shifts={shifts}
             restaurant={restaurant}
+            restaurants={restaurants}
             onNavigateTab={setActiveTab}
           />
         )}
 
         {activeTab === 'export' && (
-          <ExportScheduleView shifts={shifts} employees={employees} restaurant={restaurant} />
+          <ExportScheduleView shifts={selectedRestaurantFilter === 'ALL' ? shifts : shifts.filter((s) => s.restaurantId === selectedRestaurantFilter)} employees={employees} restaurant={restaurant} />
         )}
       </main>
 

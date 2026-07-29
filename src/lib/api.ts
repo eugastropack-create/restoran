@@ -41,6 +41,7 @@ export const api = {
     }),
 
   // Restaurant
+  getRestaurants: () => fetchJson<Restaurant[]>('/api/restaurants'),
   getRestaurant: () => fetchJson<Restaurant>('/api/restaurant'),
   updateRestaurant: (data: Partial<Restaurant>) =>
     fetchJson<Restaurant>('/api/restaurant', {

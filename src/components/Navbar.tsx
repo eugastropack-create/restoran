@@ -16,23 +16,31 @@ import { User, Restaurant } from '../types';
 interface NavbarProps {
   currentUser: User | null;
   restaurant: Restaurant | null;
+  restaurants: Restaurant[];
+  selectedRestaurantFilter: string;
+  onSelectRestaurantFilter: (id: string) => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   users: User[];
   onSwitchUser: (user: User) => void;
   onOpenAutoScheduler: () => void;
   onOpenLoginModal: () => void;
+  onSignOut: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   restaurant,
+  restaurants,
+  selectedRestaurantFilter,
+  onSelectRestaurantFilter,
   activeTab,
   setActiveTab,
   users,
   onSwitchUser,
   onOpenAutoScheduler,
   onOpenLoginModal,
+  onSignOut,
 }) => {
   const [showUserDropdown, setShowUserDropdown] = React.useState(false);
 
@@ -42,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-30 bg-slate-900 border-b border-slate-800 text-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo & Name */}
+          {/* Brand Logo & Restaurant Switcher */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold text-white text-base shadow-sm">
               S
@@ -50,13 +58,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-lg tracking-tight text-white">StaffSync Pro</span>
-                <span className="text-[10px] bg-slate-800 text-blue-400 border border-slate-700 px-1.5 py-0.5 rounded font-mono font-medium">
-                  v2.0
+                <span className="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded font-mono font-medium">
+                  2 Restoran Ortak Çalışan
                 </span>
               </div>
-              <div className="text-xs text-slate-400 flex items-center gap-1">
-                <Building2 className="w-3 h-3 text-slate-500" />
-                <span>{restaurant?.name || 'Bistro Bella'}</span>
+
+              {/* Restaurant Selection Dropdown */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
+                <Building2 className="w-3.5 h-3.5 text-blue-400" />
+                <select
+                  value={selectedRestaurantFilter}
+                  onChange={(e) => onSelectRestaurantFilter(e.target.value)}
+                  className="bg-slate-800 border border-slate-700 text-white font-medium text-xs rounded px-2 py-0.5 focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                  <option value="ALL"> Her İki Restoran (Ortak Görünüm)</option>
+                  {restaurants.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -133,29 +154,29 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <>
                 <button
-                  id="nav-portal-btn"
-                  onClick={() => setActiveTab('portal')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === 'portal'
-                      ? 'bg-slate-800 text-white font-semibold'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                >
-                  <Calendar className="w-4 h-4" />
-                  My Schedule
-                </button>
-
-                <button
                   id="nav-my-availability-btn"
                   onClick={() => setActiveTab('requests')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     activeTab === 'requests'
-                      ? 'bg-slate-800 text-white font-semibold'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
-                  <Clock className="w-4 h-4" />
-                  My Availability
+                  <Clock className="w-4 h-4 text-blue-400" />
+                  Müsaitlik & Vardiya İsteği
+                </button>
+
+                <button
+                  id="nav-portal-btn"
+                  onClick={() => setActiveTab('portal')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === 'portal'
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Calendar className="w-4 h-4 text-emerald-400" />
+                  Benim Vardiyalarım
                 </button>
 
                 <button
@@ -163,12 +184,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => setActiveTab('export')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     activeTab === 'export'
-                      ? 'bg-slate-800 text-white font-semibold'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                   }`}
                 >
-                  <Printer className="w-4 h-4" />
-                  View & Print Roster
+                  <Printer className="w-4 h-4 text-slate-400" />
+                  Standort Vardiya Çizelgesi
                 </button>
               </>
             )}
@@ -242,17 +263,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                     ))}
                   </div>
 
-                  <div className="border-t border-slate-700/60 pt-1.5 px-2">
+                  <div className="border-t border-slate-700/60 pt-1.5 px-2 space-y-1">
                     <button
                       onClick={() => {
                         setShowUserDropdown(false);
-                        onOpenLoginModal();
+                        onSignOut();
                       }}
-                      className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-2 py-1.5 rounded hover:bg-slate-700 transition-colors"
+                      className="w-full flex items-center gap-2 text-xs text-rose-300 hover:text-white px-2 py-1.5 rounded hover:bg-rose-900/40 transition-colors font-semibold"
                     >
-                      <LogOut className="w-3.5 h-3.5 text-slate-400" />
-                      Register New Restaurant
+                      <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                      Çıkış Yap / Giriş Ekranına Dön
                     </button>
+                    {isManager && (
+                      <button
+                        onClick={() => {
+                          setShowUserDropdown(false);
+                          onOpenLoginModal();
+                        }}
+                        className="w-full flex items-center gap-2 text-xs text-slate-300 hover:text-white px-2 py-1.5 rounded hover:bg-slate-700 transition-colors"
+                      >
+                        <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                        Yeni Restoran / Şube Ekle
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

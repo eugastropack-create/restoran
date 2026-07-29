@@ -18,6 +18,7 @@ import {
 import {
   Shift,
   Employee,
+  Restaurant,
   Position,
   DayOfWeek,
 } from '../types';
@@ -34,7 +35,9 @@ import { calculateShiftDurationHours } from '../lib/schedulerEngine';
 interface ScheduleCalendarViewProps {
   shifts: Shift[];
   employees: Employee[];
-  onOpenAddShift: (date?: string, position?: Position) => void;
+  restaurants?: Restaurant[];
+  selectedRestaurantId?: string;
+  onOpenAddShift: (date?: string, position?: Position, restaurantId?: string) => void;
   onOpenEditShift: (shift: Shift) => void;
   onDeleteShift: (shiftId: string) => void;
   onOpenAutoScheduler: () => void;
@@ -74,6 +77,8 @@ const POSITION_STYLES: Record<Position, { card: string; pill: string; labelBg: s
 export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
   shifts,
   employees,
+  restaurants = [],
+  selectedRestaurantId = 'ALL',
   onOpenAddShift,
   onOpenEditShift,
   onDeleteShift,
@@ -85,7 +90,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
   );
   const [selectedPositionFilter, setSelectedPositionFilter] = useState<string>('ALL');
   const [selectedEmployeeFilter, setSelectedEmployeeFilter] = useState<string>('ALL');
-  const [groupBy, setGroupBy] = useState<'POSITION' | 'EMPLOYEE'>('POSITION');
+  const [groupBy, setGroupBy] = useState<'LOCATION' | 'POSITION' | 'EMPLOYEE'>('LOCATION');
 
   // Days of current week (Monday to Sunday)
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
@@ -236,6 +241,14 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
           {/* Group By Toggle */}
           <div className="flex items-center bg-slate-800 rounded-lg p-0.5 border border-slate-700 text-xs font-medium">
             <button
+              onClick={() => setGroupBy('LOCATION')}
+              className={`px-2.5 py-1 rounded transition-colors ${
+                groupBy === 'LOCATION' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400'
+              }`}
+            >
+              By Location (Standort)
+            </button>
+            <button
               onClick={() => setGroupBy('POSITION')}
               className={`px-2.5 py-1 rounded transition-colors ${
                 groupBy === 'POSITION' ? 'bg-blue-600 text-white font-bold' : 'text-slate-400'
@@ -273,7 +286,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs font-bold uppercase">
                 <th className="p-3 text-left w-44 border-r border-slate-200 sticky left-0 bg-slate-50 z-10">
-                  {groupBy === 'POSITION' ? 'Position' : 'Employee'}
+                  {groupBy === 'LOCATION' ? 'Standort / Location' : groupBy === 'POSITION' ? 'Position' : 'Employee'}
                 </th>
                 {weekDays.map((day) => {
                   const dateStr = format(day, 'yyyy-MM-dd');
@@ -298,7 +311,98 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
             {/* Body Rows */}
             <tbody className="divide-y divide-slate-100 text-xs">
-              {groupBy === 'POSITION' ? (
+              {groupBy === 'LOCATION' ? (
+                // Grouped by Location (Standort - Restoran)
+                [
+                  { id: 'rest-1', name: 'Ottensen', fullName: 'Bistro Bella (Ottensen)' },
+                  { id: 'rest-2', name: 'Altona', fullName: 'Trattoria Milano (Altona)' },
+                ].map((loc) => (
+                  <tr key={loc.id} className="hover:bg-slate-50/50 transition-colors">
+                    {/* Location Label Column */}
+                    <td className="p-3 border-r border-slate-200 sticky left-0 bg-white font-bold text-slate-800 z-10">
+                      <div>
+                        <div className="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+                          {loc.name}
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-medium">
+                          {loc.fullName}
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* 7 Days Columns */}
+                    {weekDays.map((day) => {
+                      const dateStr = format(day, 'yyyy-MM-dd');
+                      const dayShifts = filteredShifts.filter(
+                        (s) => s.date === dateStr && s.restaurantId === loc.id
+                      );
+
+                      return (
+                        <td
+                          key={dateStr}
+                          className="p-2 border-r border-slate-100 align-top h-36 hover:bg-slate-50/80 transition-colors relative"
+                        >
+                          <div className="space-y-1.5 h-full min-h-[110px] flex flex-col justify-between">
+                            {dayShifts.length > 0 ? (
+                              <div className="space-y-1.5">
+                                {dayShifts.map((shift) => {
+                                  const emp = employees.find((e) => e.id === shift.assignedEmployeeId);
+                                  const posStyle = POSITION_STYLES[shift.position] || POSITION_STYLES.Waiter;
+
+                                  return (
+                                    <div
+                                      key={shift.id}
+                                      className={`p-2 rounded text-[11px] ${posStyle.card} relative group/card shadow-2xs hover:shadow-sm transition-all`}
+                                    >
+                                      <p className="font-extrabold text-slate-900 leading-tight">
+                                        {emp ? emp.name : 'Staff Member'}
+                                      </p>
+                                      <p className="text-slate-600 font-medium text-[10px]">
+                                        {shift.position} • {shift.startTime} - {shift.endTime}
+                                      </p>
+
+                                      {/* Hover Actions */}
+                                      <div className="opacity-0 group-hover/card:opacity-100 transition-opacity absolute top-1 right-1 bg-white rounded p-0.5 border border-slate-200 shadow flex items-center gap-1">
+                                        <button
+                                          onClick={() => onOpenEditShift(shift)}
+                                          className="p-1 hover:bg-blue-100 text-blue-700 rounded"
+                                        >
+                                          <Edit2 className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                          onClick={() => onDeleteShift(shift.id)}
+                                          className="p-1 hover:bg-rose-100 text-rose-700 rounded"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              /* Empty / Off Day Red X Indicator */
+                              <div className="flex-1 flex items-center justify-center my-1">
+                                <span className="text-2xl font-black text-rose-400/80">✕</span>
+                              </div>
+                            )}
+
+                            {/* + Add Shift Button */}
+                            <button
+                              onClick={() => onOpenAddShift(dateStr, 'Waiter', loc.id)}
+                              className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all mt-auto"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>Vardiya Ekle</span>
+                            </button>
+                          </div>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))
+              ) : groupBy === 'POSITION' ? (
                 // Grouped by Position
                 POSITIONS.filter(
                   (pos) => selectedPositionFilter === 'ALL' || selectedPositionFilter === pos

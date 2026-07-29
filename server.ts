@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import {
+  INITIAL_RESTAURANTS,
   INITIAL_RESTAURANT,
   INITIAL_USERS,
   INITIAL_EMPLOYEES,
@@ -21,7 +22,8 @@ import {
 } from './src/types';
 
 // In-memory / persistent data store
-let restaurantStore: Restaurant = { ...INITIAL_RESTAURANT };
+let restaurantsStore: Restaurant[] = [...INITIAL_RESTAURANTS];
+let restaurantStore: Restaurant = restaurantsStore[0];
 let usersStore: User[] = [...INITIAL_USERS];
 let employeesStore: Employee[] = [...INITIAL_EMPLOYEES];
 let shiftsStore: Shift[] = [...INITIAL_SHIFTS];
@@ -33,6 +35,7 @@ function loadDatabase() {
   try {
     if (fs.existsSync(DB_FILE)) {
       const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+      if (data.restaurants) restaurantsStore = data.restaurants;
       if (data.restaurant) restaurantStore = data.restaurant;
       if (data.users) usersStore = data.users;
       if (data.employees) employeesStore = data.employees;
@@ -48,6 +51,7 @@ function loadDatabase() {
 function saveDatabase() {
   try {
     const data = {
+      restaurants: restaurantsStore,
       restaurant: restaurantStore,
       users: usersStore,
       employees: employeesStore,
@@ -119,6 +123,10 @@ async function startServer() {
   });
 
   // Restaurant Settings
+  app.get('/api/restaurants', (req, res) => {
+    res.json(restaurantsStore);
+  });
+
   app.get('/api/restaurant', (req, res) => {
     res.json(restaurantStore);
   });

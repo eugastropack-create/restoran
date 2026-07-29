@@ -4,23 +4,44 @@ import { format, addDays, startOfWeek } from 'date-fns';
 const today = new Date();
 const currentMonday = startOfWeek(today, { weekStartsOn: 1 });
 
-export const INITIAL_RESTAURANT: Restaurant = {
-  id: 'rest-1',
-  name: 'Bistro Bella Italian Kitchen',
-  address: '742 Evergreen Terrace, Downtown',
-  phone: '(555) 382-9100',
-  managerName: 'Sarah Jenkins',
-  currency: '$',
-  openingHours: {
-    Monday: { open: '08:00', close: '22:00' },
-    Tuesday: { open: '08:00', close: '22:00' },
-    Wednesday: { open: '08:00', close: '22:00' },
-    Thursday: { open: '08:00', close: '22:00' },
-    Friday: { open: '08:00', close: '23:30' },
-    Saturday: { open: '08:00', close: '23:30' },
-    Sunday: { open: '09:00', close: '21:00' },
+export const INITIAL_RESTAURANTS: Restaurant[] = [
+  {
+    id: 'rest-1',
+    name: 'Bistro Bella Italian Kitchen',
+    address: '742 Evergreen Terrace, Downtown',
+    phone: '(555) 382-9100',
+    managerName: 'Sarah Jenkins',
+    currency: '$',
+    openingHours: {
+      Monday: { open: '08:00', close: '22:00' },
+      Tuesday: { open: '08:00', close: '22:00' },
+      Wednesday: { open: '08:00', close: '22:00' },
+      Thursday: { open: '08:00', close: '22:00' },
+      Friday: { open: '08:00', close: '23:30' },
+      Saturday: { open: '08:00', close: '23:30' },
+      Sunday: { open: '09:00', close: '21:00' },
+    },
   },
-};
+  {
+    id: 'rest-2',
+    name: 'Trattoria Milano Gourmet',
+    address: '128 Grand Avenue, Westside',
+    phone: '(555) 948-2200',
+    managerName: 'Sarah Jenkins',
+    currency: '$',
+    openingHours: {
+      Monday: { open: '10:00', close: '23:00' },
+      Tuesday: { open: '10:00', close: '23:00' },
+      Wednesday: { open: '10:00', close: '23:00' },
+      Thursday: { open: '10:00', close: '23:00' },
+      Friday: { open: '10:00', close: '00:00' },
+      Saturday: { open: '10:00', close: '00:00' },
+      Sunday: { open: '10:00', close: '22:00' },
+    },
+  },
+];
+
+export const INITIAL_RESTAURANT: Restaurant = INITIAL_RESTAURANTS[0];
 
 export const INITIAL_USERS: User[] = [
   {
@@ -51,7 +72,7 @@ export const INITIAL_USERS: User[] = [
     email: 'elena.rostova@bistro.com',
     name: 'Elena Rostova',
     role: 'Employee',
-    restaurantId: 'rest-1',
+    restaurantId: 'rest-2',
     employeeId: 'emp-3',
   },
 ];
@@ -60,6 +81,8 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   {
     id: 'emp-1',
     restaurantId: 'rest-1',
+    assignedRestaurants: ['rest-1', 'rest-2'],
+    isSharedStaff: true,
     name: 'Alex Rivers',
     email: 'alex.rivers@bistro.com',
     phone: '(555) 123-4567',
@@ -75,6 +98,8 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   {
     id: 'emp-2',
     restaurantId: 'rest-1',
+    assignedRestaurants: ['rest-1', 'rest-2'],
+    isSharedStaff: true,
     name: 'Marco Rossi',
     email: 'marco.rossi@bistro.com',
     phone: '(555) 234-5678',
@@ -89,7 +114,9 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: 'emp-3',
-    restaurantId: 'rest-1',
+    restaurantId: 'rest-2',
+    assignedRestaurants: ['rest-1', 'rest-2'],
+    isSharedStaff: true,
     name: 'Elena Rostova',
     email: 'elena.rostova@bistro.com',
     phone: '(555) 345-6789',
@@ -105,6 +132,8 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   {
     id: 'emp-4',
     restaurantId: 'rest-1',
+    assignedRestaurants: ['rest-1'],
+    isSharedStaff: false,
     name: 'David Chen',
     email: 'david.chen@bistro.com',
     phone: '(555) 456-7890',
@@ -119,7 +148,9 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: 'emp-5',
-    restaurantId: 'rest-1',
+    restaurantId: 'rest-2',
+    assignedRestaurants: ['rest-1', 'rest-2'],
+    isSharedStaff: true,
     name: 'Maria Santos',
     email: 'maria.santos@bistro.com',
     phone: '(555) 567-8901',
@@ -135,6 +166,8 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   {
     id: 'emp-6',
     restaurantId: 'rest-1',
+    assignedRestaurants: ['rest-1', 'rest-2'],
+    isSharedStaff: true,
     name: 'Jordan Lee',
     email: 'jordan.lee@bistro.com',
     phone: '(555) 678-9012',
@@ -149,7 +182,9 @@ export const INITIAL_EMPLOYEES: Employee[] = [
   },
   {
     id: 'emp-7',
-    restaurantId: 'rest-1',
+    restaurantId: 'rest-2',
+    assignedRestaurants: ['rest-2'],
+    isSharedStaff: false,
     name: 'Carlos Mendez',
     email: 'carlos.mendez@bistro.com',
     phone: '(555) 789-0123',
@@ -448,6 +483,56 @@ export const INITIAL_SHIFTS: Shift[] = [
     isPublished: true,
     color: '#f59e0b',
   },
+
+  // Shifts for Restoran 2 (Trattoria Milano Gourmet) - Demonstrating Shared Staff
+  {
+    id: 'shift-201',
+    restaurantId: 'rest-2',
+    date: dateStr(0),
+    startTime: '16:00',
+    endTime: '23:00',
+    position: 'Chef',
+    assignedEmployeeId: 'emp-2', // Shared Chef Marco Rossi working evening at Restoran 2!
+    isPublished: true,
+    color: '#dc2626',
+    notes: 'Trattoria Milano evening dinner shift',
+  },
+  {
+    id: 'shift-202',
+    restaurantId: 'rest-2',
+    date: dateStr(2),
+    startTime: '11:00',
+    endTime: '19:00',
+    position: 'Cashier',
+    assignedEmployeeId: 'emp-3', // Shared Cashier Elena Rostova at Restoran 2
+    isPublished: true,
+    color: '#d97706',
+    notes: 'Trattoria Milano mid-day shift',
+  },
+  {
+    id: 'shift-203',
+    restaurantId: 'rest-2',
+    date: dateStr(4),
+    startTime: '17:00',
+    endTime: '23:30',
+    position: 'Waiter',
+    assignedEmployeeId: 'emp-1', // Shared Waiter Alex Rivers
+    isPublished: true,
+    color: '#059669',
+    notes: 'Trattoria Milano Friday peak hours',
+  },
+  {
+    id: 'shift-204',
+    restaurantId: 'rest-2',
+    date: dateStr(5),
+    startTime: '12:00',
+    endTime: '20:00',
+    position: 'Kitchen staff',
+    assignedEmployeeId: 'emp-5', // Shared Kitchen Staff Maria Santos
+    isPublished: true,
+    color: '#7c3aed',
+    notes: 'Trattoria Milano Saturday prep & service',
+  },
 ];
 
 export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
@@ -455,12 +540,37 @@ export const INITIAL_AVAILABILITY_REQUESTS: AvailabilityRequest[] = [
     id: 'req-1',
     restaurantId: 'rest-1',
     employeeId: 'emp-1',
-    employeeName: 'Alex Rivers',
-    requestedAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    requestedUnavailableDays: ['Saturday', 'Sunday'],
-    requestedMaxHours: 35,
-    reason: 'Attending evening culinary classes on weekends.',
+    employeeName: 'Alex Rivers (Ortak Çalışan / Shared Staff)',
+    requestedAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    requestedUnavailableDays: ['Sunday'],
+    requestedMaxHours: 38,
+    preferredRestaurantId: 'ALL',
+    dayRestaurantPreferences: {
+      Monday: 'rest-1',
+      Wednesday: 'rest-1',
+      Friday: 'rest-2',
+      Saturday: 'rest-2',
+    },
+    reason: 'Ortak çalışan: Hafta başında Bistro Bella (Restoran 1), Cuma-Cumartesi Trattoria Milano (Restoran 2) şubesinde çalışabilirim.',
     status: 'Pending',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'req-2',
+    restaurantId: 'rest-2',
+    employeeId: 'emp-3',
+    employeeName: 'Elena Rostova (Ortak Çalışan / Shared Staff)',
+    requestedAvailableDays: ['Monday', 'Wednesday', 'Friday', 'Saturday', 'Sunday'],
+    requestedUnavailableDays: ['Tuesday', 'Thursday'],
+    requestedMaxHours: 25,
+    preferredRestaurantId: 'rest-2',
+    dayRestaurantPreferences: {
+      Monday: 'rest-1',
+      Wednesday: 'rest-2',
+      Friday: 'rest-2',
+    },
+    reason: 'Müsaitlik güncellemesi: Çarşamba ve Cuma günleri Trattoria Milano şubesinde kasa/barista nöbeti tercih ediyorum.',
+    status: 'Approved',
     createdAt: new Date().toISOString(),
   },
 ];
