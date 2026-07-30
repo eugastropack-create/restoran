@@ -34,7 +34,23 @@ import {
 import { CheckCircle2, AlertCircle, X } from 'lucide-react';
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null); // Starts at AuthPortal Landing Page
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('staffsync_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('staffsync_current_user');
+    }
+  }, [currentUser]);
+
   const [restaurants, setRestaurants] = useState<Restaurant[]>(INITIAL_RESTAURANTS);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(INITIAL_RESTAURANTS[0]);
   const [selectedRestaurantFilter, setSelectedRestaurantFilter] = useState<string>('ALL');
@@ -76,9 +92,10 @@ export default function App() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [restsData, restData, empData, shiftData, reqData] = await Promise.all([
+        const [restsData, restData, usersData, empData, shiftData, reqData] = await Promise.all([
           api.getRestaurants().catch(() => INITIAL_RESTAURANTS),
           api.getRestaurant().catch(() => INITIAL_RESTAURANT),
+          api.getUsers().catch(() => INITIAL_USERS),
           api.getEmployees().catch(() => INITIAL_EMPLOYEES),
           api.getShifts().catch(() => INITIAL_SHIFTS),
           api.getAvailabilityRequests().catch(() => INITIAL_AVAILABILITY_REQUESTS),
@@ -86,6 +103,7 @@ export default function App() {
 
         if (restsData && restsData.length > 0) setRestaurants(restsData);
         if (restData) setRestaurant(restData);
+        if (usersData && usersData.length > 0) setUsers(usersData);
         if (empData) setEmployees(empData);
         if (shiftData) setShifts(shiftData);
         if (reqData) setAvailabilityRequests(reqData);
@@ -439,7 +457,7 @@ export default function App() {
     showToast(`Hoş geldiniz ${user.name}! Vardiya isteklerinizi girebilirsiniz.`);
   };
 
-  const handleEmployeeRegister = (empData: {
+  const handleEmployeeRegister = async (empData: {
     name: string;
     email: string;
     phone: string;
@@ -476,6 +494,13 @@ export default function App() {
       restaurantId: 'rest-1',
       password: empData.password,
     };
+
+    try {
+      await api.createEmployee(newEmp).catch(() => null);
+      await api.createUser(newUser).catch(() => null);
+    } catch (err) {
+      console.warn('API error saving registered employee:', err);
+    }
 
     setEmployees((prev) => [newEmp, ...prev]);
     setUsers((prev) => [newUser, ...prev]);

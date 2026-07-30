@@ -122,6 +122,26 @@ async function startServer() {
     return res.json({ user: newUser, restaurant: newRest });
   });
 
+  // Users CRUD
+  app.get('/api/users', (req, res) => {
+    res.json(usersStore);
+  });
+
+  app.post('/api/users', (req, res) => {
+    const newUser: User = {
+      id: req.body.id || 'usr-' + Date.now(),
+      email: req.body.email,
+      name: req.body.name,
+      role: req.body.role || 'Employee',
+      restaurantId: req.body.restaurantId || restaurantStore.id,
+      employeeId: req.body.employeeId,
+      password: req.body.password,
+    };
+    usersStore.push(newUser);
+    saveDatabase();
+    res.status(201).json(newUser);
+  });
+
   // Restaurant Settings
   app.get('/api/restaurants', (req, res) => {
     res.json(restaurantsStore);

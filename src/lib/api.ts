@@ -40,6 +40,14 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  // Users
+  getUsers: () => fetchJson<User[]>('/api/users'),
+  createUser: (user: Partial<User>) =>
+    fetchJson<User>('/api/users', {
+      method: 'POST',
+      body: JSON.stringify(user),
+    }),
+
   // Restaurant
   getRestaurants: () => fetchJson<Restaurant[]>('/api/restaurants'),
   getRestaurant: () => fetchJson<Restaurant>('/api/restaurant'),
