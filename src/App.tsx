@@ -13,6 +13,23 @@ import { AuthPortal } from './components/AuthPortal';
 import { api } from './lib/api';
 import { runAutoScheduler } from './lib/schedulerEngine';
 import {
+  seedInitialFirestoreDataIfNeeded,
+  fetchFirestoreUsers,
+  saveFirestoreUser,
+  fetchFirestoreRestaurants,
+  saveFirestoreRestaurant,
+  fetchFirestoreEmployees,
+  saveFirestoreEmployee,
+  deleteFirestoreEmployee,
+  fetchFirestoreShifts,
+  saveFirestoreShift,
+  saveFirestoreShiftsBatch,
+  deleteFirestoreShift,
+  fetchFirestoreRequests,
+  saveFirestoreRequest,
+  updateFirestoreRequestStatus,
+} from './lib/firebase';
+import {
   INITIAL_RESTAURANTS,
   INITIAL_RESTAURANT,
   INITIAL_USERS,
@@ -51,15 +68,110 @@ export default function App() {
     }
   }, [currentUser]);
 
-  const [restaurants, setRestaurants] = useState<Restaurant[]>(INITIAL_RESTAURANTS);
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(INITIAL_RESTAURANTS[0]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_restaurants');
+      return saved ? JSON.parse(saved) : INITIAL_RESTAURANTS;
+    } catch {
+      return INITIAL_RESTAURANTS;
+    }
+  });
+
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_restaurant');
+      return saved ? JSON.parse(saved) : INITIAL_RESTAURANTS[0];
+    } catch {
+      return INITIAL_RESTAURANTS[0];
+    }
+  });
+
   const [selectedRestaurantFilter, setSelectedRestaurantFilter] = useState<string>('ALL');
-  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
-  const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
-  const [shifts, setShifts] = useState<Shift[]>(INITIAL_SHIFTS);
-  const [availabilityRequests, setAvailabilityRequests] = useState<AvailabilityRequest[]>(
-    INITIAL_AVAILABILITY_REQUESTS
-  );
+
+  const [users, setUsers] = useState<User[]>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_users');
+      return saved ? JSON.parse(saved) : INITIAL_USERS;
+    } catch {
+      return INITIAL_USERS;
+    }
+  });
+
+  const [employees, setEmployees] = useState<Employee[]>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_employees');
+      return saved ? JSON.parse(saved) : INITIAL_EMPLOYEES;
+    } catch {
+      return INITIAL_EMPLOYEES;
+    }
+  });
+
+  const [shifts, setShifts] = useState<Shift[]>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_shifts');
+      return saved ? JSON.parse(saved) : INITIAL_SHIFTS;
+    } catch {
+      return INITIAL_SHIFTS;
+    }
+  });
+
+  const [availabilityRequests, setAvailabilityRequests] = useState<AvailabilityRequest[]>(() => {
+    try {
+      const saved = localStorage.getItem('staffsync_requests');
+      return saved ? JSON.parse(saved) : INITIAL_AVAILABILITY_REQUESTS;
+    } catch {
+      return INITIAL_AVAILABILITY_REQUESTS;
+    }
+  });
+
+  // LocalStorage Sync Effects
+  useEffect(() => {
+    try {
+      localStorage.setItem('staffsync_restaurants', JSON.stringify(restaurants));
+    } catch (e) {
+      console.warn('Failed to save restaurants to localStorage', e);
+    }
+  }, [restaurants]);
+
+  useEffect(() => {
+    try {
+      if (restaurant) localStorage.setItem('staffsync_restaurant', JSON.stringify(restaurant));
+    } catch (e) {
+      console.warn('Failed to save restaurant to localStorage', e);
+    }
+  }, [restaurant]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('staffsync_users', JSON.stringify(users));
+    } catch (e) {
+      console.warn('Failed to save users to localStorage', e);
+    }
+  }, [users]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('staffsync_employees', JSON.stringify(employees));
+    } catch (e) {
+      console.warn('Failed to save employees to localStorage', e);
+    }
+  }, [employees]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('staffsync_shifts', JSON.stringify(shifts));
+    } catch (e) {
+      console.warn('Failed to save shifts to localStorage', e);
+    }
+  }, [shifts]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('staffsync_requests', JSON.stringify(availabilityRequests));
+    } catch (e) {
+      console.warn('Failed to save availabilityRequests to localStorage', e);
+    }
+  }, [availabilityRequests]);
 
   const [activeTab, setActiveTab] = useState<string>('requests');
 
@@ -88,27 +200,27 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Load initial data from API server if available, fallback to mock store
+  // Load initial data from Firebase Firestore & API server
   useEffect(() => {
     async function loadData() {
       try {
-        const [restsData, restData, usersData, empData, shiftData, reqData] = await Promise.all([
-          api.getRestaurants().catch(() => INITIAL_RESTAURANTS),
-          api.getRestaurant().catch(() => INITIAL_RESTAURANT),
-          api.getUsers().catch(() => INITIAL_USERS),
-          api.getEmployees().catch(() => INITIAL_EMPLOYEES),
-          api.getShifts().catch(() => INITIAL_SHIFTS),
-          api.getAvailabilityRequests().catch(() => INITIAL_AVAILABILITY_REQUESTS),
+        await seedInitialFirestoreDataIfNeeded();
+
+        const [fsRests, fsUsers, fsEmps, fsShifts, fsReqs] = await Promise.all([
+          fetchFirestoreRestaurants().catch(() => null),
+          fetchFirestoreUsers().catch(() => null),
+          fetchFirestoreEmployees().catch(() => null),
+          fetchFirestoreShifts().catch(() => null),
+          fetchFirestoreRequests().catch(() => null),
         ]);
 
-        if (restsData && restsData.length > 0) setRestaurants(restsData);
-        if (restData) setRestaurant(restData);
-        if (usersData && usersData.length > 0) setUsers(usersData);
-        if (empData) setEmployees(empData);
-        if (shiftData) setShifts(shiftData);
-        if (reqData) setAvailabilityRequests(reqData);
+        if (fsRests && fsRests.length > 0) setRestaurants(fsRests);
+        if (fsUsers && fsUsers.length > 0) setUsers(fsUsers);
+        if (fsEmps && fsEmps.length > 0) setEmployees(fsEmps);
+        if (fsShifts && fsShifts.length > 0) setShifts(fsShifts);
+        if (fsReqs && fsReqs.length > 0) setAvailabilityRequests(fsReqs);
       } catch (err) {
-        console.warn('API fetch fallback to local memory state:', err);
+        console.warn('Firestore load fallback to local storage state:', err);
       }
     }
     loadData();
@@ -172,6 +284,7 @@ export default function App() {
           ...shiftData,
           restaurantId: targetRestId,
         }));
+        await saveFirestoreShift(updated as Shift).catch((e) => console.warn('Firestore error:', e));
         setShifts(shifts.map((s) => (s.id === updated.id ? (updated as Shift) : s)));
         showToast('Schichtdetails aktualisiert.');
       } else {
@@ -186,6 +299,7 @@ export default function App() {
           notes: shiftData.notes || '',
           isPublished: false,
         }));
+        await saveFirestoreShift(newShift as Shift).catch((e) => console.warn('Firestore error:', e));
         setShifts([...shifts, newShift as Shift]);
         showToast('Neue Schicht erfolgreich erstellt.');
       }
@@ -197,6 +311,7 @@ export default function App() {
   const handleDeleteShift = async (shiftId: string) => {
     try {
       await api.deleteShift(shiftId).catch(() => null);
+      await deleteFirestoreShift(shiftId).catch((e) => console.warn('Firestore error:', e));
       setShifts(shifts.filter((s) => s.id !== shiftId));
       showToast('Shift deleted.');
     } catch (err) {
@@ -213,6 +328,7 @@ export default function App() {
       });
 
       if (result.success) {
+        await saveFirestoreShiftsBatch(result.generatedShifts).catch((e) => console.warn('Firestore error:', e));
         setShifts(result.generatedShifts);
         showToast(
           `Automatische Planung: ${result.assignedShiftsCount} Schichten zugewiesen (${result.unfilledShiftsCount} offen).`
@@ -222,6 +338,7 @@ export default function App() {
     } catch (err) {
       // Fallback in case api call threw uncaught exception
       const fallbackResult = runAutoScheduler(shifts, employees, options);
+      saveFirestoreShiftsBatch(fallbackResult.generatedShifts).catch((e) => console.warn('Firestore error:', e));
       setShifts(fallbackResult.generatedShifts);
       showToast(
         `Automatische Planung: ${fallbackResult.assignedShiftsCount} Schichten zugewiesen (${fallbackResult.unfilledShiftsCount} offen).`
@@ -233,7 +350,9 @@ export default function App() {
   const handlePublishSchedule = async (dates: string[]) => {
     try {
       await api.publishSchedule(dates).catch(() => null);
-      setShifts(shifts.map((s) => (dates.includes(s.date) ? { ...s, isPublished: true } : s)));
+      const updatedShifts = shifts.map((s) => (dates.includes(s.date) ? { ...s, isPublished: true } : s));
+      await saveFirestoreShiftsBatch(updatedShifts).catch((e) => console.warn('Firestore error:', e));
+      setShifts(updatedShifts);
       showToast(`Published schedule for week! Team notified.`);
     } catch (err) {
       showToast('Publish failed', 'error');
@@ -274,6 +393,7 @@ export default function App() {
         return newEmp;
       });
 
+      await saveFirestoreEmployee(created).catch((e) => console.warn('Firestore error:', e));
       setEmployees((prev) => [...prev, created]);
 
       // Add user record
@@ -285,6 +405,7 @@ export default function App() {
         restaurantId: targetRestId,
         employeeId: created.id,
       };
+      await saveFirestoreUser(newUser).catch((e) => console.warn('Firestore error:', e));
       setUsers((prev) => [...prev, newUser]);
 
       const restName = restaurants.find((r) => r.id === targetRestId)?.name || 'Restaurant';
@@ -300,6 +421,7 @@ export default function App() {
         ...employees.find((e) => e.id === id)!,
         ...empData,
       }));
+      await saveFirestoreEmployee(updated as Employee).catch((e) => console.warn('Firestore error:', e));
       setEmployees(employees.map((e) => (e.id === id ? (updated as Employee) : e)));
       showToast('Employee profile updated.');
     } catch (err) {
@@ -310,6 +432,7 @@ export default function App() {
   const handleDeleteEmployee = async (id: string) => {
     try {
       await api.deleteEmployee(id).catch(() => null);
+      await deleteFirestoreEmployee(id).catch((e) => console.warn('Firestore error:', e));
       setEmployees(employees.filter((e) => e.id !== id));
       setShifts(
         shifts.map((s) => (s.assignedEmployeeId === id ? { ...s, assignedEmployeeId: null } : s))
@@ -336,7 +459,8 @@ export default function App() {
         createdAt: new Date().toISOString(),
       }));
 
-      setAvailabilityRequests([created, ...availabilityRequests]);
+      await saveFirestoreRequest(created as AvailabilityRequest).catch((e) => console.warn('Firestore error:', e));
+      setAvailabilityRequests([created as AvailabilityRequest, ...availabilityRequests]);
       showToast('Availability request submitted.');
     } catch (err) {
       showToast('Failed to submit request', 'error');
@@ -354,6 +478,7 @@ export default function App() {
         return { ...req, status, ...(changeRequestReason ? { changeRequestReason } : {}) };
       });
 
+      await updateFirestoreRequestStatus(id, status).catch((e) => console.warn('Firestore error:', e));
       setAvailabilityRequests(
         availabilityRequests.map((r) => (r.id === id ? (updated as AvailabilityRequest) : r))
       );
@@ -362,18 +487,19 @@ export default function App() {
       if (status === 'Approved') {
         const req = availabilityRequests.find((r) => r.id === id);
         if (req) {
-          setEmployees(
-            employees.map((e) =>
-              e.id === req.employeeId
-                ? {
-                    ...e,
-                    availableDays: req.requestedAvailableDays,
-                    unavailableDays: req.requestedUnavailableDays,
-                    maxWeeklyHours: req.requestedMaxHours,
-                  }
-                : e
-            )
-          );
+          const empToUpdate = employees.find((e) => e.id === req.employeeId);
+          if (empToUpdate) {
+            const updatedEmp = {
+              ...empToUpdate,
+              availableDays: req.requestedAvailableDays,
+              unavailableDays: req.requestedUnavailableDays,
+              maxWeeklyHours: req.requestedMaxHours,
+            };
+            await saveFirestoreEmployee(updatedEmp).catch((e) => console.warn('Firestore error:', e));
+            setEmployees(
+              employees.map((e) => (e.id === req.employeeId ? updatedEmp : e))
+            );
+          }
         }
       }
 
@@ -427,6 +553,9 @@ export default function App() {
         };
         return { user: newUser, restaurant: newRest };
       });
+
+      await saveFirestoreRestaurant(res.restaurant).catch((e) => console.warn('Firestore error:', e));
+      await saveFirestoreUser(res.user).catch((e) => console.warn('Firestore error:', e));
 
       setRestaurant(res.restaurant);
       setCurrentUser(res.user);
@@ -500,6 +629,13 @@ export default function App() {
       await api.createUser(newUser).catch(() => null);
     } catch (err) {
       console.warn('API error saving registered employee:', err);
+    }
+
+    try {
+      await saveFirestoreEmployee(newEmp);
+      await saveFirestoreUser(newUser);
+    } catch (err) {
+      console.warn('Firestore error saving registered employee:', err);
     }
 
     setEmployees((prev) => [newEmp, ...prev]);

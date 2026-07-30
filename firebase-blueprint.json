@@ -1,0 +1,73 @@
+{
+  "entities": {
+    "users": {
+      "title": "Users",
+      "description": "User accounts in StaffSync",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "restaurantId": { "type": "string" },
+        "employeeId": { "type": "string" }
+      },
+      "required": ["email", "name", "role", "restaurantId"]
+    },
+    "restaurants": {
+      "title": "Restaurants",
+      "description": "Restaurant branches",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "managerName": { "type": "string" },
+        "currency": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "employees": {
+      "title": "Employees",
+      "description": "Restaurant staff details",
+      "type": "object",
+      "properties": {
+        "restaurantId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "position": { "type": "string" },
+        "employmentType": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["name", "email", "restaurantId"]
+    },
+    "shifts": {
+      "title": "Shifts",
+      "description": "Shift schedule assignments",
+      "type": "object",
+      "properties": {
+        "restaurantId": { "type": "string" },
+        "date": { "type": "string" },
+        "startTime": { "type": "string" },
+        "endTime": { "type": "string" },
+        "position": { "type": "string" },
+        "assignedEmployeeId": { "type": "string" },
+        "isPublished": { "type": "boolean" }
+      },
+      "required": ["restaurantId", "date", "startTime", "endTime"]
+    },
+    "availabilityRequests": {
+      "title": "Availability Requests",
+      "description": "Weekly availability and time-off requests",
+      "type": "object",
+      "properties": {
+        "restaurantId": { "type": "string" },
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["restaurantId", "employeeId", "status"]
+    }
+  }
+}
