@@ -111,7 +111,7 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
   const [activeWeekIndex, setActiveWeekIndex] = useState<number>(0);
 
   // Availability per week: Map weekIndex -> Record<DayOfWeek, AvailabilityType>
-  type AvailabilityType = 'Ganztägig' | 'Halbtag (Morgen)' | 'Halbtag (Abend)' | 'Frei / Nicht verfügbar';
+  type AvailabilityType = 'Ganztägig' | 'Halbtag (Abend)' | 'Frei / Nicht verfügbar';
 
   const initialWeekAvailability = (): Record<number, Record<DayOfWeek, AvailabilityType>> => {
     const initialDayMap: Record<DayOfWeek, AvailabilityType> = {
@@ -395,7 +395,6 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                             className="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-[11px] font-semibold text-slate-800 focus:outline-none focus:border-blue-500 shadow-xs"
                           >
                             <option value="Ganztägig">🟢 Ganztägig</option>
-                            <option value="Halbtag (Morgen)">🌤️ Halbtag (Morgen)</option>
                             <option value="Halbtag (Abend)">🌙 Halbtag (Abend)</option>
                             <option value="Frei / Nicht verfügbar">🔴 Frei / Nicht verfügbar</option>
                           </select>
@@ -603,7 +602,7 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                         <button
                           onClick={() => onRequestStatusUpdate(req.id, 'Unlocked')}
                           className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
-                          title="Değişiklik Talebini Onayla ve Çalışanın Yeni İstek Ekranını Aç"
+                          title="Änderungswunsch genehmigen und neues Eingabeformular freischalten"
                         >
                           <Unlock className="w-3.5 h-3.5" /> Onayla & Formu Aç
                         </button>

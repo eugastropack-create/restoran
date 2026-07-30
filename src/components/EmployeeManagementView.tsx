@@ -28,7 +28,7 @@ interface EmployeeManagementViewProps {
   setIsAddOpen: (open: boolean) => void;
 }
 
-const POSITIONS: Position[] = ['Çalışan'];
+const POSITIONS: Position[] = ['Teammitglied'];
 const DAYS_OF_WEEK: DayOfWeek[] = [
   'Monday',
   'Tuesday',
@@ -57,7 +57,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [position, setPosition] = useState<Position>('Çalışan');
+  const [position, setPosition] = useState<Position>('Teammitglied');
   const [restaurantId, setRestaurantId] = useState<string>(
     selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurants[0]?.id || 'rest-1'
   );
@@ -80,7 +80,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
     setName('');
     setEmail('');
     setPhone('');
-    setPosition('Çalışan');
+    setPosition('Teammitglied');
     setRestaurantId(
       selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurants[0]?.id || 'rest-1'
     );

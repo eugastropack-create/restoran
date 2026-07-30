@@ -33,7 +33,7 @@ interface DashboardViewProps {
 }
 
 const POSITION_STYLES: Record<string, { card: string; pill: string }> = {
-  Çalışan: {
+  Teammitglied: {
     card: 'bg-blue-50/80 border-l-4 border-blue-500',
     pill: 'bg-blue-100 text-blue-800 border-blue-200',
   },
@@ -191,7 +191,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="space-y-2.5">
               {todaysShifts.map((shift) => {
                 const assignedEmp = employees.find((e) => e.id === shift.assignedEmployeeId);
-                const posStyle = POSITION_STYLES[shift.position] || POSITION_STYLES['Çalışan'];
+                const posStyle = POSITION_STYLES[shift.position] || POSITION_STYLES['Teammitglied'];
 
                 if (!assignedEmp) {
                   return (

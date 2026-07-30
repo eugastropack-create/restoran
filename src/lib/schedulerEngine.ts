@@ -124,7 +124,7 @@ export function runAutoScheduler(
             date: dateStr,
             startTime: slot.startTime,
             endTime: slot.endTime,
-            position: 'Çalışan',
+            position: 'Teammitglied',
             assignedEmployeeId: null,
             isPublished: false,
             color: restId === 'rest-1' ? '#3b82f6' : '#8b5cf6',

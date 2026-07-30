@@ -1,4 +1,4 @@
-export type Position = 'Çalışan';
+export type Position = 'Teammitglied';
 
 export type EmploymentType = 'Full-time' | 'Part-time';
 

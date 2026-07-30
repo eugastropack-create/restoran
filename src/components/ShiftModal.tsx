@@ -16,7 +16,7 @@ interface ShiftModalProps {
   defaultRestaurantId?: string;
 }
 
-const POSITIONS: Position[] = ['Çalışan'];
+const POSITIONS: Position[] = ['Teammitglied'];
 
 const GERMAN_DAYS: Record<DayOfWeek, string> = {
   Monday: 'Montag',
@@ -43,7 +43,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
   const [date, setDate] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('12:00');
   const [endTime, setEndTime] = useState<string>('17:00');
-  const [position, setPosition] = useState<Position>('Çalışan');
+  const [position, setPosition] = useState<Position>('Teammitglied');
   const [assignedEmployeeId, setAssignedEmployeeId] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [restaurantId, setRestaurantId] = useState<string>('rest-1');
@@ -61,7 +61,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
       setDate(defaultDate || new Date().toISOString().split('T')[0]);
       setStartTime('12:00');
       setEndTime('17:00');
-      setPosition(defaultPosition || 'Çalışan');
+      setPosition(defaultPosition || 'Teammitglied');
       setAssignedEmployeeId('');
       setNotes('');
       setRestaurantId(defaultRestaurantId || restaurants[0]?.id || 'rest-1');

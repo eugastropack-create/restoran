@@ -44,10 +44,10 @@ interface ScheduleCalendarViewProps {
   onPublishSchedule: (dates: string[]) => void;
 }
 
-const POSITIONS: Position[] = ['Çalışan'];
+const POSITIONS: Position[] = ['Teammitglied'];
 
 const POSITION_STYLES: Record<string, { card: string; pill: string; labelBg: string }> = {
-  Çalışan: {
+  Teammitglied: {
     card: 'bg-blue-50 border-l-4 border-blue-500 text-slate-900',
     pill: 'bg-blue-100 text-blue-800 border-blue-200',
     labelBg: 'bg-blue-50 border-blue-200 text-blue-800',
@@ -393,7 +393,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
                             {/* + Add Shift Button */}
                             <button
-                              onClick={() => onOpenAddShift(dateStr, 'Çalışan', loc.id)}
+                              onClick={() => onOpenAddShift(dateStr, 'Teammitglied', loc.id)}
                               className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all mt-auto cursor-pointer"
                             >
                               <Plus className="w-3 h-3" />

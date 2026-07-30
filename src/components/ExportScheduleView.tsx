@@ -47,10 +47,55 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
 
     try {
       const element = printRef.current;
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc, clonedElement) => {
+          // Remove all stylesheet links and style tags to avoid html2canvas oklch CSS parser crash
+          const styleTags = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+          styleTags.forEach((tag) => tag.remove());
+
+          // Recursively apply resolved computed RGB styles to all cloned elements
+          const origNodes = element.querySelectorAll('*');
+          const clonedNodes = clonedElement.querySelectorAll('*');
+
+          // Root container style
+          const rootCs = window.getComputedStyle(element);
+          clonedElement.style.backgroundColor = rootCs.backgroundColor || '#ffffff';
+          clonedElement.style.color = rootCs.color || '#000000';
+          clonedElement.style.fontFamily = rootCs.fontFamily || 'sans-serif';
+          clonedElement.style.padding = rootCs.padding;
+          clonedElement.style.margin = rootCs.margin;
+
+          origNodes.forEach((origNode, idx) => {
+            const clonedNode = clonedNodes[idx] as HTMLElement;
+            if (!clonedNode) return;
+
+            const cs = window.getComputedStyle(origNode);
+
+            // Copy explicit resolved computed styles (browsers convert oklch to rgb)
+            clonedNode.style.backgroundColor = cs.backgroundColor;
+            clonedNode.style.color = cs.color;
+            clonedNode.style.borderColor = cs.borderColor;
+            clonedNode.style.borderStyle = cs.borderStyle;
+            clonedNode.style.borderWidth = cs.borderWidth;
+            clonedNode.style.fontSize = cs.fontSize;
+            clonedNode.style.fontWeight = cs.fontWeight;
+            clonedNode.style.fontFamily = cs.fontFamily;
+            clonedNode.style.padding = cs.padding;
+            clonedNode.style.margin = cs.margin;
+            clonedNode.style.textAlign = cs.textAlign;
+            clonedNode.style.display = cs.display;
+            clonedNode.style.borderRadius = cs.borderRadius;
+            clonedNode.style.boxSizing = cs.boxSizing;
+            clonedNode.style.verticalAlign = cs.verticalAlign;
+            clonedNode.style.width = cs.width;
+            clonedNode.style.height = cs.height;
+          });
+        },
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -60,13 +105,38 @@ export const ExportScheduleView: React.FC<ExportScheduleViewProps> = ({
         format: 'a4',
       });
 
-      const imgWidth = 280;
+      const pdfWidth = 297; // A4 landscape width in mm
+      const pdfHeight = 210; // A4 landscape height in mm
+      const margin = 8;
+      const printableWidth = pdfWidth - margin * 2; // 281mm
+      const printableHeight = pdfHeight - margin * 2; // 194mm
+
+      const imgWidth = printableWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 8, 8, imgWidth, Math.min(imgHeight, 195));
+      if (imgHeight <= printableHeight) {
+        pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+      } else {
+        // Multi-page PDF output
+        let heightLeft = imgHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= printableHeight;
+
+        while (heightLeft > 0) {
+          position = margin - (imgHeight - heightLeft);
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+          heightLeft -= printableHeight;
+        }
+      }
+
       pdf.save(`MITARBEITER-DIENSTPLAN_${format(currentWeekStart, 'yyyy-MM-dd')}.pdf`);
     } catch (err) {
       console.error('PDF export error:', err);
+      // Fallback: window.print() if html2canvas fails for any reason
+      window.print();
     } finally {
       setIsExportingPdf(false);
     }
