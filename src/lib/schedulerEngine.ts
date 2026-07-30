@@ -69,6 +69,23 @@ export function doShiftsOverlap(
 }
 
 /**
+ * Helper to get 7 YYYY-MM-DD date strings starting from a weekStartDate (Monday)
+ */
+export function getWeekDates(weekStartDate: string): string[] {
+  const dates: string[] = [];
+  const base = new Date(weekStartDate + 'T00:00:00');
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    dates.push(`${yyyy}-${mm}-${dd}`);
+  }
+  return dates;
+}
+
+/**
  * Rule-Based Automatic Schedule Generator Engine (NO AI)
  */
 export function runAutoScheduler(
@@ -77,10 +94,55 @@ export function runAutoScheduler(
   options: AutoScheduleOptions
 ): AutoScheduleResult {
   const logs: AutoScheduleLog[] = [];
-  const generatedShifts: Shift[] = [...existingShifts];
+  let generatedShifts: Shift[] = JSON.parse(JSON.stringify(existingShifts));
 
   // Active employees only
   const activeEmployees = employees.filter((e) => e.status === 'Active');
+
+  // Calculate target dates for week
+  const weekDates = options.weekStartDate ? getWeekDates(options.weekStartDate) : [];
+
+  // Check if target week has any shifts in generatedShifts
+  const existingShiftsInWeek = weekDates.length > 0
+    ? generatedShifts.filter((s) => weekDates.includes(s.date))
+    : generatedShifts;
+
+  // If no shifts exist for target week, auto-generate standard shift templates for each restaurant
+  if (weekDates.length > 0 && existingShiftsInWeek.length === 0) {
+    const defaultRestaurants = ['rest-1', 'rest-2'];
+    const defaultSlots = [
+      { startTime: '12:00', endTime: '17:00' },
+      { startTime: '17:00', endTime: '22:00' },
+    ];
+
+    for (const dateStr of weekDates) {
+      for (const restId of defaultRestaurants) {
+        for (const slot of defaultSlots) {
+          generatedShifts.push({
+            id: 'shift-auto-' + restId + '-' + dateStr + '-' + slot.startTime.replace(':', ''),
+            restaurantId: restId,
+            date: dateStr,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            position: 'Çalışan',
+            assignedEmployeeId: null,
+            isPublished: false,
+            color: restId === 'rest-1' ? '#3b82f6' : '#8b5cf6',
+          });
+        }
+      }
+    }
+  }
+
+  // Reset assignment if clearExistingDrafts is enabled
+  if (options.clearExistingDrafts) {
+    generatedShifts = generatedShifts.map((s) => {
+      if (weekDates.length > 0 && !weekDates.includes(s.date)) {
+        return s; // Keep other weeks untouched
+      }
+      return { ...s, assignedEmployeeId: null };
+    });
+  }
 
   // Map to track weekly scheduled hours for each employee
   const employeeWeeklyHours: Record<string, number> = {};
@@ -88,32 +150,21 @@ export function runAutoScheduler(
     employeeWeeklyHours[e.id] = 0;
   });
 
-  // Calculate existing hours if not clearing existing
-  if (!options.clearExistingDrafts) {
-    existingShifts.forEach((s) => {
-      if (s.assignedEmployeeId && employeeWeeklyHours[s.assignedEmployeeId] !== undefined) {
-        const hours = calculateShiftDurationHours(s.startTime, s.endTime);
-        employeeWeeklyHours[s.assignedEmployeeId] += hours;
-      }
-    });
-  }
+  // Calculate existing hours for already assigned shifts
+  generatedShifts.forEach((s) => {
+    if (s.assignedEmployeeId && employeeWeeklyHours[s.assignedEmployeeId] !== undefined) {
+      const hours = calculateShiftDurationHours(s.startTime, s.endTime);
+      employeeWeeklyHours[s.assignedEmployeeId] += hours;
+    }
+  });
 
-  // Determine shifts that need assignment
-  // If options include requiredShiftsTemplate, generate unfilled shift objects first
-  let shiftsToSchedule: Shift[] = [];
+  // Determine shifts to schedule
+  let shiftsToSchedule = generatedShifts.filter((s) => {
+    if (weekDates.length > 0 && !weekDates.includes(s.date)) return false;
+    return !s.assignedEmployeeId;
+  });
 
-  if (options.clearExistingDrafts) {
-    // Keep only manual/already assigned or reset assignments
-    shiftsToSchedule = existingShifts.map((s) => ({
-      ...s,
-      assignedEmployeeId: null,
-    }));
-  } else {
-    // Target unassigned shifts
-    shiftsToSchedule = existingShifts.filter((s) => !s.assignedEmployeeId);
-  }
-
-  // Sort shifts to schedule by date and start time for consistent sequential allocation
+  // Sort shifts to schedule by date and start time
   shiftsToSchedule.sort((a, b) => {
     if (a.date !== b.date) return a.date.localeCompare(b.date);
     return a.startTime.localeCompare(b.startTime);
@@ -128,12 +179,20 @@ export function runAutoScheduler(
 
     // Filter candidate employees according to rules
     const candidates = activeEmployees.filter((emp) => {
-      // Rule 1: Position Restriction Removed - All active employees are eligible as "Çalışan"
-      // (No position restriction)
+      // Rule 1: Restaurant Eligibility Check
+      if (shift.restaurantId) {
+        const empRestaurants =
+          emp.assignedRestaurants && emp.assignedRestaurants.length > 0
+            ? emp.assignedRestaurants
+            : [emp.restaurantId];
+        if (!empRestaurants.includes(shift.restaurantId) && !emp.isSharedStaff) {
+          return false; // Not assigned to this restaurant
+        }
+      }
 
       // Rule 2: Unavailable Days
       if (options.respectUnavailableDays) {
-        if (emp.unavailableDays.includes(dayOfWeek)) {
+        if (emp.unavailableDays && emp.unavailableDays.includes(dayOfWeek)) {
           return false;
         }
       }
@@ -170,19 +229,17 @@ export function runAutoScheduler(
         startTime: shift.startTime,
         endTime: shift.endTime,
         status: 'Unfilled',
-        reason: `No available ${shift.position} found on ${dayOfWeek} who meets max hours (${shiftHours}h shift) and availability rules.`,
+        reason: `No available staff found for ${shift.restaurantId === 'rest-2' ? 'Ottensen' : 'Altona'} on ${dayOfWeek} (${shift.startTime}-${shift.endTime}) meeting max hours/availability rules.`,
       });
       continue;
     }
 
     // Rule 5: Balance Working Hours between candidate employees
-    // Sort candidate list by lowest current weekly scheduled hours first
     if (options.balanceHours) {
       candidates.sort((a, b) => {
         const hoursA = employeeWeeklyHours[a.id] || 0;
         const hoursB = employeeWeeklyHours[b.id] || 0;
         if (hoursA !== hoursB) return hoursA - hoursB;
-        // Secondary sort: Full-time preferred over Part-time if equal, or random/alphabetical
         return a.name.localeCompare(b.name);
       });
     }
@@ -204,6 +261,7 @@ export function runAutoScheduler(
       generatedShifts.push(shift);
     }
 
+    const restName = shift.restaurantId === 'rest-2' ? 'Ottensen' : 'Altona';
     logs.push({
       shiftId: shift.id,
       date: shift.date,
@@ -212,7 +270,7 @@ export function runAutoScheduler(
       endTime: shift.endTime,
       status: 'Assigned',
       assignedEmployeeName: selectedEmployee.name,
-      reason: `Assigned based on position match, ${dayOfWeek} availability, and work hour balancing (${employeeWeeklyHours[selectedEmployee.id]} total hours).`,
+      reason: `Assigned to ${selectedEmployee.name} at ${restName} on ${dayOfWeek} (${employeeWeeklyHours[selectedEmployee.id]}h total).`,
     });
   }
 

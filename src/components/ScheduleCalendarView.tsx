@@ -44,7 +44,7 @@ interface ScheduleCalendarViewProps {
   onPublishSchedule: (dates: string[]) => void;
 }
 
-const POSITIONS: Position[] = ['Waiter', 'Chef', 'Cashier', 'Barista', 'Kitchen staff'];
+const POSITIONS: Position[] = ['Çalışan'];
 
 const POSITION_STYLES: Record<string, { card: string; pill: string; labelBg: string }> = {
   Çalışan: {
@@ -195,7 +195,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
           <button
             id="btn-add-shift-calendar"
-            onClick={() => onOpenAddShift()}
+            onClick={() => onOpenAddShift(undefined, undefined, selectedRestaurantId !== 'ALL' ? selectedRestaurantId : undefined)}
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
@@ -213,21 +213,6 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <span>Filter:</span>
           </div>
 
-          {/* Position Selector */}
-          <select
-            id="filter-position-select"
-            value={selectedPositionFilter}
-            onChange={(e) => setSelectedPositionFilter(e.target.value)}
-            className="bg-slate-800 border border-slate-700 text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-400 cursor-pointer"
-          >
-            <option value="ALL">Alle Positionen</option>
-            {POSITIONS.map((pos) => (
-              <option key={pos} value={pos}>
-                {pos}
-              </option>
-            ))}
-          </select>
-
           {/* Employee Selector */}
           <select
             id="filter-employee-select"
@@ -238,7 +223,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
             <option value="ALL">Alle Mitarbeiter</option>
             {employees.map((emp) => (
               <option key={emp.id} value={emp.id}>
-                {emp.name} ({emp.position})
+                {emp.name}
               </option>
             ))}
           </select>
@@ -377,7 +362,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                         {emp ? emp.name : 'Unbesetzt'}
                                       </p>
                                       <p className="text-slate-600 font-medium text-[10px]">
-                                        {shift.position} • {shift.startTime} - {shift.endTime}
+                                        {shift.startTime} - {shift.endTime}
                                       </p>
 
                                       {/* Hover Actions */}
@@ -520,7 +505,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
 
                             {/* + Add Shift Button */}
                             <button
-                              onClick={() => onOpenAddShift(dateStr, position)}
+                              onClick={() => onOpenAddShift(dateStr, position, selectedRestaurantId !== 'ALL' ? selectedRestaurantId : undefined)}
                               className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all cursor-pointer"
                             >
                               <Plus className="w-3 h-3" />
@@ -545,7 +530,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                         <div>
                           <div className="font-bold text-slate-900">{emp.name}</div>
                           <div className="text-[10px] text-slate-500 font-medium uppercase">
-                            {emp.position} • Max {emp.maxWeeklyHours} Std.
+                            Max {emp.maxWeeklyHours} Std.
                           </div>
                         </div>
                       </td>
@@ -572,7 +557,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                                     className={`p-2 rounded text-[11px] ${posStyle.card} relative group/card shadow-2xs hover:shadow-sm transition-all`}
                                   >
                                     <p className="font-bold text-slate-900 leading-tight">
-                                      {shift.position}
+                                      Schicht
                                     </p>
                                     <p className="text-slate-500 text-[10px]">
                                       {shift.startTime} - {shift.endTime}
@@ -598,7 +583,7 @@ export const ScheduleCalendarView: React.FC<ScheduleCalendarViewProps> = ({
                               })}
 
                               <button
-                                onClick={() => onOpenAddShift(dateStr, emp.position)}
+                                onClick={() => onOpenAddShift(dateStr, emp.position, emp.restaurantId || (selectedRestaurantId !== 'ALL' ? selectedRestaurantId : undefined))}
                                 className="w-full py-1 border border-dashed border-slate-200 rounded text-[10px] text-slate-400 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50/50 flex items-center justify-center gap-1 transition-all cursor-pointer"
                               >
                                 <Plus className="w-3 h-3" />

@@ -11,7 +11,11 @@ import {
   Building2,
   Users2,
   Sparkles,
+  Lock,
+  Unlock,
+  RefreshCw,
 } from 'lucide-react';
+import { format, addDays, startOfWeek } from 'date-fns';
 import { AvailabilityRequest, User as UserType, Employee, DayOfWeek, Restaurant } from '../types';
 
 interface AvailabilityRequestsViewProps {
@@ -20,7 +24,7 @@ interface AvailabilityRequestsViewProps {
   employees: Employee[];
   restaurants?: Restaurant[];
   onRequestSubmit: (req: Partial<AvailabilityRequest>) => void;
-  onRequestStatusUpdate: (id: string, status: 'Approved' | 'Rejected') => void;
+  onRequestStatusUpdate: (id: string, status: AvailabilityRequest['status'], changeReason?: string) => void;
 }
 
 const DAYS_OF_WEEK: DayOfWeek[] = [
@@ -43,6 +47,31 @@ const GERMAN_DAYS: Record<DayOfWeek, string> = {
   Sunday: 'Sonntag',
 };
 
+const GERMAN_MONTHS = [
+  'Jan.',
+  'Feb.',
+  'März',
+  'Apr.',
+  'Mai',
+  'Juni',
+  'Juli',
+  'Aug.',
+  'Sept.',
+  'Okt.',
+  'Nov.',
+  'Dez.',
+];
+
+const formatDayAndMonth = (date: Date): string => {
+  const d = date.getDate();
+  const m = GERMAN_MONTHS[date.getMonth()];
+  return `${d}. ${m}`;
+};
+
+const formatShortDate = (date: Date): string => {
+  return format(date, 'dd.MM.');
+};
+
 export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> = ({
   requests,
   currentUser,
@@ -53,12 +82,31 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
 }) => {
   const isManager = currentUser?.role === 'Manager';
 
-  // 3-Week Availability State
-  const WEEKS = [
-    { id: '1. Woche (Diese Woche)', label: '1. Woche (Diese Woche)' },
-    { id: '2. Woche (Nächste Woche)', label: '2. Woche (Nächste Woche)' },
-    { id: '3. Woche (In 2 Wochen)', label: '3. Woche (In 2 Wochen)' },
-  ];
+  // 3-Week Availability State with dynamic date calculation
+  const baseWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+
+  const getWeekInfo = (weekIdx: number) => {
+    const weekStart = addDays(baseWeekStart, weekIdx * 7);
+    const weekEnd = addDays(weekStart, 6);
+    const dateRangeStr = `${formatDayAndMonth(weekStart)} - ${formatDayAndMonth(weekEnd)}`;
+
+    let prefix = '';
+    if (weekIdx === 0) prefix = '1. Woche (Diese Woche';
+    else if (weekIdx === 1) prefix = '2. Woche (Nächste Woche';
+    else prefix = '3. Woche (In 2 Wochen';
+
+    const label = `${prefix}: ${dateRangeStr})`;
+
+    return {
+      id: label,
+      label,
+      weekStart,
+      weekEnd,
+      dateRangeStr,
+    };
+  };
+
+  const WEEKS = [getWeekInfo(0), getWeekInfo(1), getWeekInfo(2)];
 
   const [activeWeekIndex, setActiveWeekIndex] = useState<number>(0);
 
@@ -91,6 +139,16 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
   const [submittedSuccess, setSubmittedSuccess] = useState<boolean>(false);
 
   const currentEmp = employees.find((e) => e.id === currentUser?.employeeId);
+
+  // Check existing employee requests to enforce 1 request rule
+  const myRequests = requests.filter((r) => r.employeeId === currentEmp?.id);
+  const hasSubmitted = myRequests.length > 0;
+  const isUnlocked = myRequests.some((r) => r.status === 'Unlocked');
+  const isChangeRequested = myRequests.some((r) => r.status === 'ChangeRequested');
+  const latestRequest = myRequests[0];
+
+  const [changeReasonInput, setChangeReasonInput] = useState<string>('');
+  const [changeRequestedSuccess, setChangeRequestedSuccess] = useState<boolean>(false);
 
   const setDayAvailability = (weekIdx: number, day: DayOfWeek, type: AvailabilityType) => {
     setWeeklyAvailabilityMap((prev) => ({
@@ -161,29 +219,108 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
         </div>
       </div>
 
-      {/* Employee Submission Form */}
+      {/* Employee Submission Section */}
       {!isManager && currentEmp && (
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Send className="w-4 h-4 text-blue-600" />
-                <span>Neue Verfügbarkeitsmeldung senden</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                {currentEmp.name} - {currentEmp.isSharedStaff ? 'Gemeinsamer Mitarbeiter' : 'Restaurant-Mitarbeiter'}
-              </p>
-            </div>
-          </div>
+        <>
+          {hasSubmitted && !isUnlocked ? (
+            /* Locked State Card: Employee already submitted request */
+            <div className="bg-white p-6 rounded-2xl border border-amber-200/80 shadow-sm space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Verfügbarkeitsmeldung bereits eingereicht
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    Sie haben Ihre Verfügbarkeit für die nächsten 3 Wochen bereits an den Manager übermittelt.
+                    Um eine neue Anfrage zu stellen oder bestehende Zeiten zu ändern, müssen Sie eine{' '}
+                    <strong>Änderungsanfrage (Değişiklik Talebi)</strong> stellen. Sobald der Manager diese genehmigt, wird das Formular wieder freigeschaltet.
+                  </p>
+                </div>
+              </div>
 
-          {submittedSuccess && (
-            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>Ihre Verfügbarkeitsmeldungen für alle 3 Wochen wurden erfolgreich an den Manager gesendet!</span>
-            </div>
-          )}
+              {isChangeRequested ? (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-xs font-semibold flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600 flex-shrink-0 animate-pulse" />
+                  <span>
+                    ⏳ <strong>Änderungsanfrage aktiv:</strong> Sie haben eine Anfrage auf Änderung gesendet. Bitte warten Sie auf die Freigabe durch den Manager.
+                  </span>
+                </div>
+              ) : (
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-xs">
+                  <h4 className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <RefreshCw className="w-4 h-4 text-amber-600" />
+                    <span>Değişiklik Talebinde Bulun / Änderungsanfrage stellen</span>
+                  </h4>
+                  <p className="text-slate-500 text-[11px]">
+                    Geben Sie bitte kurz an, warum Sie Ihre Verfügbarkeiten ändern möchten:
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={changeReasonInput}
+                      onChange={(e) => setChangeReasonInput(e.target.value)}
+                      placeholder="z. B. Schulstunden plan geändert, Notfall, Wunscheschichten..."
+                      className="flex-1 bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-amber-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!latestRequest) return;
+                        onRequestStatusUpdate(
+                          latestRequest.id,
+                          'ChangeRequested',
+                          changeReasonInput || 'Mitarbeiter fordert Änderung der Verfügbarkeit an.'
+                        );
+                        setChangeRequestedSuccess(true);
+                        setChangeReasonInput('');
+                      }}
+                      className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-xl shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Änderungsanfrage senden</span>
+                    </button>
+                  </div>
 
-          <form onSubmit={handleEmployeeSubmit} className="space-y-6 text-xs">
+                  {changeRequestedSuccess && (
+                    <div className="text-emerald-700 font-semibold text-[11px] flex items-center gap-1 mt-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Änderungsanfrage wurde erfolgreich an den Manager übermittelt!</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Active Submission Form */
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Send className="w-4 h-4 text-blue-600" />
+                    <span>Neue Verfügbarkeitsmeldung senden</span>
+                    {isUnlocked && (
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                        <Unlock className="w-3 h-3 text-emerald-600" /> Freigeschaltet
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {currentEmp.name} - {currentEmp.isSharedStaff ? 'Gemeinsamer Mitarbeiter' : 'Restaurant-Mitarbeiter'}
+                  </p>
+                </div>
+              </div>
+
+              {submittedSuccess && (
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>Ihre Verfügbarkeitsmeldungen für alle 3 Wochen wurden erfolgreich an den Manager gesendet!</span>
+                </div>
+              )}
+
+              <form onSubmit={handleEmployeeSubmit} className="space-y-6 text-xs">
             {/* 3 Weeks Availability Stacked */}
             <div className="space-y-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-slate-100 pb-2">
@@ -206,8 +343,11 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-2.5">
-                    {DAYS_OF_WEEK.map((day) => {
+                    {DAYS_OF_WEEK.map((day, dayIdx) => {
                       const currentType = weeklyAvailabilityMap[weekIdx][day];
+                      const weekStart = addDays(baseWeekStart, weekIdx * 7);
+                      const dayDate = addDays(weekStart, dayIdx);
+                      const dateFormatted = formatDayAndMonth(dayDate);
 
                       let cardStyle = 'bg-white border-slate-200 text-slate-800';
                       if (currentType === 'Ganztägig') {
@@ -223,10 +363,18 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                           key={day}
                           className={`p-3 rounded-xl border flex flex-col justify-between space-y-2.5 transition-all ${cardStyle}`}
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-xs">{GERMAN_DAYS[day]}</span>
+                          <div className="flex items-start justify-between gap-1">
+                            <div>
+                              <span className="font-bold text-xs text-slate-900 block">
+                                {GERMAN_DAYS[day]}
+                              </span>
+                              <span className="text-[11px] font-bold text-blue-600 flex items-center gap-1 mt-0.5">
+                                <Calendar className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                                <span>{dateFormatted}</span>
+                              </span>
+                            </div>
                             <span
-                              className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
+                              className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide flex-shrink-0 ${
                                 currentType === 'Ganztägig'
                                   ? 'bg-emerald-600 text-white'
                                   : currentType.includes('Halbtag')
@@ -297,6 +445,8 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
           </form>
         </div>
       )}
+    </>
+  )}
 
       {/* Requests List */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
@@ -324,15 +474,27 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-slate-900 text-sm">{req.employeeName}</span>
                     <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                      className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1 ${
                         req.status === 'Approved'
                           ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                           : req.status === 'Rejected'
                           ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                          : req.status === 'ChangeRequested'
+                          ? 'bg-purple-100 text-purple-900 border border-purple-300 animate-pulse'
+                          : req.status === 'Unlocked'
+                          ? 'bg-blue-100 text-blue-900 border border-blue-300'
                           : 'bg-amber-100 text-amber-800 border border-amber-300'
                       }`}
                     >
-                      {req.status === 'Approved' ? 'Genehmigt' : req.status === 'Rejected' ? 'Abgelehnt' : 'Ausstehend'}
+                      {req.status === 'Approved'
+                        ? 'Genehmigt'
+                        : req.status === 'Rejected'
+                        ? 'Abgelehnt'
+                        : req.status === 'ChangeRequested'
+                        ? '⚠️ Değişiklik Talebi'
+                        : req.status === 'Unlocked'
+                        ? '🔓 Freigegeben'
+                        : 'Ausstehend'}
                     </span>
 
                     {req.selectedWeek && (
@@ -351,7 +513,7 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                           Tägliche Verfügbarkeitsdetails:
                         </strong>
                         <div className="flex flex-wrap gap-1.5">
-                          {DAYS_OF_WEEK.map((day) => {
+                          {DAYS_OF_WEEK.map((day, dayIdx) => {
                             const type = req.dayAvailabilityTypes?.[day] || 'Ganztägig';
                             let badgeStyle = 'bg-emerald-50 text-emerald-800 border-emerald-200';
                             if (type.includes('Halbtag')) {
@@ -360,12 +522,21 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                               badgeStyle = 'bg-rose-50 text-rose-800 border-rose-200';
                             }
 
+                            let dateText = '';
+                            if (req.selectedWeek) {
+                              let weekOffset = 0;
+                              if (req.selectedWeek.includes('2. Woche') || req.selectedWeek.includes('Nächste')) weekOffset = 1;
+                              else if (req.selectedWeek.includes('3. Woche') || req.selectedWeek.includes('In 2')) weekOffset = 2;
+                              const dDate = addDays(addDays(baseWeekStart, weekOffset * 7), dayIdx);
+                              dateText = ` (${formatShortDate(dDate)})`;
+                            }
+
                             return (
                               <span
                                 key={day}
                                 className={`text-[10px] px-2 py-0.5 rounded-lg border font-semibold flex items-center gap-1 ${badgeStyle}`}
                               >
-                                <span className="font-bold">{GERMAN_DAYS[day].slice(0, 2)}:</span> {type}
+                                <span className="font-bold">{GERMAN_DAYS[day].slice(0, 2)}{dateText}:</span> {type}
                               </span>
                             );
                           })}
@@ -394,24 +565,66 @@ export const AvailabilityRequestsView: React.FC<AvailabilityRequestsViewProps> =
                         <span>"{req.reason}"</span>
                       </div>
                     )}
+
+                    {req.changeRequestReason && (
+                      <div className="text-purple-900 bg-purple-50 p-2.5 rounded-xl border border-purple-200 text-xs mt-2 font-semibold flex items-start gap-2">
+                        <RefreshCw className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <span className="font-bold text-purple-950 block">Değişiklik Talebi / Grund für Änderung:</span>
+                          <span>"{req.changeRequestReason}"</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Manager Action Buttons */}
-                {isManager && req.status === 'Pending' && (
+                {isManager && (
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={() => onRequestStatusUpdate(req.id, 'Approved')}
-                      className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Genehmigen
-                    </button>
-                    <button
-                      onClick={() => onRequestStatusUpdate(req.id, 'Rejected')}
-                      className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
-                    >
-                      <XCircle className="w-3.5 h-3.5" /> Ablehnen
-                    </button>
+                    {req.status === 'Pending' && (
+                      <>
+                        <button
+                          onClick={() => onRequestStatusUpdate(req.id, 'Approved')}
+                          className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Genehmigen
+                        </button>
+                        <button
+                          onClick={() => onRequestStatusUpdate(req.id, 'Rejected')}
+                          className="flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
+                        >
+                          <XCircle className="w-3.5 h-3.5" /> Ablehnen
+                        </button>
+                      </>
+                    )}
+
+                    {req.status === 'ChangeRequested' && (
+                      <>
+                        <button
+                          onClick={() => onRequestStatusUpdate(req.id, 'Unlocked')}
+                          className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
+                          title="Değişiklik Talebini Onayla ve Çalışanın Yeni İstek Ekranını Aç"
+                        >
+                          <Unlock className="w-3.5 h-3.5" /> Onayla & Formu Aç
+                        </button>
+                        <button
+                          onClick={() => onRequestStatusUpdate(req.id, 'Approved')}
+                          className="flex items-center gap-1 bg-slate-600 hover:bg-slate-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
+                        >
+                          <XCircle className="w-3.5 h-3.5" /> Ablehnen
+                        </button>
+                      </>
+                    )}
+
+                    {(req.status === 'Approved' || req.status === 'Rejected') && (
+                      <button
+                        onClick={() => onRequestStatusUpdate(req.id, 'Unlocked')}
+                        className="flex items-center gap-1 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-3.5 py-2 rounded-xl shadow transition-colors cursor-pointer"
+                        title="Formular für Mitarbeiter zur erneuten Eingabe freischalten"
+                      >
+                        <Unlock className="w-3.5 h-3.5 text-blue-400" /> Formular Freischalten
+                      </button>
+                    )}
                   </div>
                 )}
               </div>

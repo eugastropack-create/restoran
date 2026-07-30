@@ -103,10 +103,14 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(reqData),
     }),
-  updateAvailabilityRequestStatus: (id: string, status: 'Approved' | 'Rejected') =>
+  updateAvailabilityRequestStatus: (
+    id: string,
+    status: 'Approved' | 'Rejected' | 'ChangeRequested' | 'Unlocked',
+    changeRequestReason?: string
+  ) =>
     fetchJson<AvailabilityRequest>(`/api/availability-requests/${id}/status`, {
       method: 'PUT',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, changeRequestReason }),
     }),
 
   // Stats

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Clock, User, AlertTriangle, Check, Calendar as CalendarIcon } from 'lucide-react';
-import { Shift, Employee, Position, DayOfWeek } from '../types';
+import { X, Clock, User, AlertTriangle, Check, Calendar as CalendarIcon, Building2 } from 'lucide-react';
+import { Shift, Employee, Position, DayOfWeek, Restaurant } from '../types';
 import { calculateShiftDurationHours, getDayOfWeekFromDate } from '../lib/schedulerEngine';
 
 interface ShiftModalProps {
@@ -10,11 +10,13 @@ interface ShiftModalProps {
   onDeleteShift?: (shiftId: string) => void;
   initialShift?: Shift | null;
   employees: Employee[];
+  restaurants?: Restaurant[];
   defaultDate?: string;
   defaultPosition?: Position;
+  defaultRestaurantId?: string;
 }
 
-const POSITIONS: Position[] = ['Waiter', 'Chef', 'Cashier', 'Barista', 'Kitchen staff'];
+const POSITIONS: Position[] = ['Çalışan'];
 
 const GERMAN_DAYS: Record<DayOfWeek, string> = {
   Monday: 'Montag',
@@ -33,15 +35,18 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
   onDeleteShift,
   initialShift,
   employees,
+  restaurants = [],
   defaultDate,
   defaultPosition,
+  defaultRestaurantId,
 }) => {
   const [date, setDate] = useState<string>('');
-  const [startTime, setStartTime] = useState<string>('09:00');
+  const [startTime, setStartTime] = useState<string>('12:00');
   const [endTime, setEndTime] = useState<string>('17:00');
   const [position, setPosition] = useState<Position>('Çalışan');
   const [assignedEmployeeId, setAssignedEmployeeId] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [restaurantId, setRestaurantId] = useState<string>('rest-1');
 
   useEffect(() => {
     if (initialShift) {
@@ -51,15 +56,17 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
       setPosition(initialShift.position);
       setAssignedEmployeeId(initialShift.assignedEmployeeId || '');
       setNotes(initialShift.notes || '');
+      setRestaurantId(initialShift.restaurantId || defaultRestaurantId || restaurants[0]?.id || 'rest-1');
     } else {
       setDate(defaultDate || new Date().toISOString().split('T')[0]);
-      setStartTime('09:00');
+      setStartTime('12:00');
       setEndTime('17:00');
       setPosition(defaultPosition || 'Çalışan');
       setAssignedEmployeeId('');
       setNotes('');
+      setRestaurantId(defaultRestaurantId || restaurants[0]?.id || 'rest-1');
     }
-  }, [initialShift, defaultDate, defaultPosition, isOpen]);
+  }, [initialShift, defaultDate, defaultPosition, defaultRestaurantId, isOpen, restaurants]);
 
   if (!isOpen) return null;
 
@@ -70,6 +77,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
     e.preventDefault();
     onSaveShift({
       id: initialShift?.id,
+      restaurantId,
       date,
       startTime,
       endTime,
@@ -101,35 +109,38 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Date */}
+          {/* Restaurant / Standort */}
+          {restaurants && restaurants.length > 0 && (
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Schichtdatum</label>
-              <input
-                type="date"
-                required
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500"
-              />
-              <span className="text-[10px] text-slate-500 mt-1 block">Tag: {GERMAN_DAYS[selectedDayOfWeek]}</span>
-            </div>
-
-            {/* Required Position */}
-            <div>
-              <label className="block text-slate-700 font-semibold mb-1">Erforderliche Position</label>
+              <label className="block text-slate-700 font-semibold mb-1 flex items-center gap-1.5">
+                <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                <span>Standort / Restaurant</span>
+              </label>
               <select
-                value={position}
-                onChange={(e) => setPosition(e.target.value as Position)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500 cursor-pointer"
+                value={restaurantId}
+                onChange={(e) => setRestaurantId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-semibold focus:outline-none focus:border-amber-500 cursor-pointer"
               >
-                {POSITIONS.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
+                {restaurants.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
                   </option>
                 ))}
               </select>
             </div>
+          )}
+
+          {/* Date */}
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Schichtdatum</label>
+            <input
+              type="date"
+              required
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 font-medium focus:outline-none focus:border-amber-500"
+            />
+            <span className="text-[10px] text-slate-500 mt-1 block">Tag: {GERMAN_DAYS[selectedDayOfWeek]}</span>
           </div>
 
           {/* Time Interval */}
@@ -176,7 +187,7 @@ export const ShiftModal: React.FC<ShiftModalProps> = ({
               {employees.map((emp) => {
                 const isUnavailable = emp.unavailableDays.includes(selectedDayOfWeek);
 
-                let label = `${emp.name} (${emp.position})`;
+                let label = emp.name;
                 if (isUnavailable) label += ` ⚠️ Nicht verfügbar am ${GERMAN_DAYS[selectedDayOfWeek]}`;
 
                 return (

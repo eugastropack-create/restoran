@@ -13,11 +13,14 @@ import {
   X,
   Search,
   Check,
+  Building2,
 } from 'lucide-react';
-import { Employee, Position, EmploymentType, DayOfWeek } from '../types';
+import { Employee, Position, EmploymentType, DayOfWeek, Restaurant } from '../types';
 
 interface EmployeeManagementViewProps {
   employees: Employee[];
+  restaurants?: Restaurant[];
+  selectedRestaurantFilter?: string;
   onAddEmployee: (emp: Partial<Employee>) => void;
   onUpdateEmployee: (id: string, emp: Partial<Employee>) => void;
   onDeleteEmployee: (id: string) => void;
@@ -38,6 +41,8 @@ const DAYS_OF_WEEK: DayOfWeek[] = [
 
 export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
   employees,
+  restaurants = [],
+  selectedRestaurantFilter = 'ALL',
   onAddEmployee,
   onUpdateEmployee,
   onDeleteEmployee,
@@ -53,6 +58,9 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [position, setPosition] = useState<Position>('Çalışan');
+  const [restaurantId, setRestaurantId] = useState<string>(
+    selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurants[0]?.id || 'rest-1'
+  );
   const [employmentType, setEmploymentType] = useState<EmploymentType>('Full-time');
   const [maxWeeklyHours, setMaxWeeklyHours] = useState<number>(40);
   const [hourlyRate, setHourlyRate] = useState<number>(18.5);
@@ -73,6 +81,9 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
     setEmail('');
     setPhone('');
     setPosition('Çalışan');
+    setRestaurantId(
+      selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurants[0]?.id || 'rest-1'
+    );
     setEmploymentType('Full-time');
     setMaxWeeklyHours(40);
     setHourlyRate(18.5);
@@ -87,6 +98,7 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
     setEmail(emp.email);
     setPhone(emp.phone);
     setPosition(emp.position);
+    setRestaurantId(emp.restaurantId || restaurants[0]?.id || 'rest-1');
     setEmploymentType(emp.employmentType);
     setMaxWeeklyHours(emp.maxWeeklyHours);
     setHourlyRate(emp.hourlyRate);
@@ -114,6 +126,9 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
       email,
       phone,
       position,
+      restaurantId: 'rest-1',
+      assignedRestaurants: ['rest-1', 'rest-2'],
+      isSharedStaff: true,
       employmentType,
       maxWeeklyHours: Number(maxWeeklyHours),
       hourlyRate: Number(hourlyRate),
@@ -141,7 +156,12 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
     const matchesPos =
       selectedPositionFilter === 'ALL' || emp.position === selectedPositionFilter;
 
-    return matchesSearch && matchesPos;
+    const matchesRest =
+      selectedRestaurantFilter === 'ALL' ||
+      emp.restaurantId === selectedRestaurantFilter ||
+      emp.assignedRestaurants?.includes(selectedRestaurantFilter);
+
+    return matchesSearch && matchesPos && matchesRest;
   });
 
   return (
@@ -170,7 +190,8 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-100 p-2.5 rounded-xl border border-slate-200">
-        <div className="relative w-full sm:w-72">
+        {/* Search Bar */}
+        <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           <input
             type="text"
@@ -179,22 +200,6 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500"
           />
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-500 font-medium whitespace-nowrap">Position filtern:</span>
-          <select
-            value={selectedPositionFilter}
-            onChange={(e) => setSelectedPositionFilter(e.target.value)}
-            className="bg-white border border-slate-300 text-slate-800 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-blue-500"
-          >
-            <option value="ALL">Alle Positionen</option>
-            {POSITIONS.map((pos) => (
-              <option key={pos} value={pos}>
-                {pos}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
 
@@ -215,8 +220,9 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                   <div>
                     <h3 className="font-bold text-slate-900 text-sm leading-tight">{emp.name}</h3>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] bg-blue-50 text-blue-800 border border-blue-200 px-2 py-0.5 rounded font-semibold">
-                        {emp.position}
+                      <span className="text-[10px] bg-purple-50 text-purple-800 border border-purple-200 px-2 py-0.5 rounded font-bold flex items-center gap-1">
+                        <Building2 className="w-3 h-3 text-purple-600" />
+                        Altona & Ottensen (Beide)
                       </span>
                       <span className="text-[11px] text-slate-500">
                         {emp.employmentType === 'Full-time' ? 'Vollzeit' : 'Teilzeit'}
@@ -355,21 +361,6 @@ export const EmployeeManagementView: React.FC<EmployeeManagementViewProps> = ({
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
                   />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Hauptposition</label>
-                  <select
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value as Position)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
-                  >
-                    {POSITIONS.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
 

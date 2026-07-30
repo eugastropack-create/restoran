@@ -94,10 +94,6 @@ export const EmployeePortalView: React.FC<EmployeePortalViewProps> = ({
                 )}
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-300 mt-1">
-                <span className="bg-blue-600/30 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded font-semibold">
-                  {employee.position}
-                </span>
-                <span>•</span>
                 <span>{employee.employmentType}</span>
               </div>
             </div>

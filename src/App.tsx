@@ -11,6 +11,7 @@ import { ExportScheduleView } from './components/ExportScheduleView';
 import { LoginModal } from './components/LoginModal';
 import { AuthPortal } from './components/AuthPortal';
 import { api } from './lib/api';
+import { runAutoScheduler } from './lib/schedulerEngine';
 import {
   INITIAL_RESTAURANTS,
   INITIAL_RESTAURANT,
@@ -51,6 +52,9 @@ export default function App() {
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [defaultShiftDate, setDefaultShiftDate] = useState<string | undefined>(undefined);
   const [defaultShiftPosition, setDefaultShiftPosition] = useState<Position | undefined>(
+    undefined
+  );
+  const [defaultShiftRestaurantId, setDefaultShiftRestaurantId] = useState<string | undefined>(
     undefined
   );
 
@@ -124,10 +128,11 @@ export default function App() {
   };
 
   // Handlers for Shifts
-  const handleOpenAddShift = (date?: string, position?: Position) => {
+  const handleOpenAddShift = (date?: string, position?: Position, restaurantId?: string) => {
     setEditingShift(null);
     setDefaultShiftDate(date);
     setDefaultShiftPosition(position);
+    setDefaultShiftRestaurantId(restaurantId);
     setIsShiftModalOpen(true);
   };
 
@@ -137,31 +142,37 @@ export default function App() {
   };
 
   const handleSaveShift = async (shiftData: Partial<Shift>) => {
+    const targetRestId =
+      shiftData.restaurantId ||
+      defaultShiftRestaurantId ||
+      (selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurant?.id || 'rest-1');
+
     try {
       if (shiftData.id) {
-        const updated = await api.updateShift(shiftData.id, shiftData).catch(() => ({
+        const updated = await api.updateShift(shiftData.id, { ...shiftData, restaurantId: targetRestId }).catch(() => ({
           ...shifts.find((s) => s.id === shiftData.id)!,
           ...shiftData,
+          restaurantId: targetRestId,
         }));
         setShifts(shifts.map((s) => (s.id === updated.id ? (updated as Shift) : s)));
-        showToast('Shift details updated.');
+        showToast('Schichtdetails aktualisiert.');
       } else {
-        const newShift = await api.createShift(shiftData).catch(() => ({
+        const newShift = await api.createShift({ ...shiftData, restaurantId: targetRestId }).catch(() => ({
           id: 'shift-' + Date.now(),
-          restaurantId: restaurant?.id || 'rest-1',
+          restaurantId: targetRestId,
           date: shiftData.date || new Date().toISOString().split('T')[0],
-          startTime: shiftData.startTime || '09:00',
+          startTime: shiftData.startTime || '12:00',
           endTime: shiftData.endTime || '17:00',
-          position: shiftData.position || 'Waiter',
+          position: shiftData.position || 'Çalışan',
           assignedEmployeeId: shiftData.assignedEmployeeId || null,
           notes: shiftData.notes || '',
           isPublished: false,
         }));
         setShifts([...shifts, newShift as Shift]);
-        showToast('New shift created successfully.');
+        showToast('Neue Schicht erfolgreich erstellt.');
       }
     } catch (err) {
-      showToast('Error saving shift', 'error');
+      showToast('Fehler beim Speichern der Schicht', 'error');
     }
   };
 
@@ -180,20 +191,24 @@ export default function App() {
     try {
       const result = await api.autoGenerateSchedule(options).catch(() => {
         // Fallback local run
-        const { runAutoScheduler } = require('./lib/schedulerEngine');
         return runAutoScheduler(shifts, employees, options);
       });
 
       if (result.success) {
         setShifts(result.generatedShifts);
         showToast(
-          `Auto-Scheduler assigned ${result.assignedShiftsCount} shifts (${result.unfilledShiftsCount} unfilled).`
+          `Automatische Planung: ${result.assignedShiftsCount} Schichten zugewiesen (${result.unfilledShiftsCount} offen).`
         );
       }
       return result;
     } catch (err) {
-      showToast('Auto-scheduler error', 'error');
-      throw err;
+      // Fallback in case api call threw uncaught exception
+      const fallbackResult = runAutoScheduler(shifts, employees, options);
+      setShifts(fallbackResult.generatedShifts);
+      showToast(
+        `Automatische Planung: ${fallbackResult.assignedShiftsCount} Schichten zugewiesen (${fallbackResult.unfilledShiftsCount} offen).`
+      );
+      return fallbackResult;
     }
   };
 
@@ -209,18 +224,23 @@ export default function App() {
 
   // Handlers for Employees
   const handleAddEmployee = async (empData: Partial<Employee>) => {
+    const targetRestId =
+      empData.restaurantId ||
+      (selectedRestaurantFilter !== 'ALL' ? selectedRestaurantFilter : restaurant?.id || 'rest-1');
+
     try {
-      const created = await api.createEmployee(empData).catch(() => {
+      const created = await api.createEmployee({ ...empData, restaurantId: targetRestId }).catch(() => {
         const newEmp: Employee = {
           id: 'emp-' + Date.now(),
-          restaurantId: restaurant?.id || 'rest-1',
-          name: empData.name || 'New Staff',
-          email: empData.email || 'staff@restaurant.com',
-          phone: empData.phone || '(555) 000-0000',
-          position: empData.position || 'Waiter',
+          restaurantId: targetRestId,
+          assignedRestaurants: empData.assignedRestaurants || [targetRestId],
+          name: empData.name || 'Neuer Mitarbeiter',
+          email: empData.email || 'mitarbeiter@restaurant.de',
+          phone: empData.phone || '+49 151 00000000',
+          position: empData.position || 'Çalışan',
           employmentType: empData.employmentType || 'Full-time',
           maxWeeklyHours: empData.maxWeeklyHours || 40,
-          hourlyRate: empData.hourlyRate || 18.0,
+          hourlyRate: empData.hourlyRate || 18.5,
           availableDays: empData.availableDays || [
             'Monday',
             'Tuesday',
@@ -236,7 +256,7 @@ export default function App() {
         return newEmp;
       });
 
-      setEmployees([...employees, created]);
+      setEmployees((prev) => [...prev, created]);
 
       // Add user record
       const newUser: User = {
@@ -244,14 +264,15 @@ export default function App() {
         email: created.email,
         name: created.name,
         role: 'Employee',
-        restaurantId: restaurant?.id || 'rest-1',
+        restaurantId: targetRestId,
         employeeId: created.id,
       };
-      setUsers([...users, newUser]);
+      setUsers((prev) => [...prev, newUser]);
 
-      showToast(`Employee profile created for ${created.name}`);
+      const restName = restaurants.find((r) => r.id === targetRestId)?.name || 'Restaurant';
+      showToast(`Mitarbeiterprofil für ${created.name} (${restName}) erstellt`);
     } catch (err) {
-      showToast('Failed to create employee profile', 'error');
+      showToast('Fehler beim Erstellen des Mitarbeiterprofils', 'error');
     }
   };
 
@@ -306,12 +327,13 @@ export default function App() {
 
   const handleUpdateAvailabilityRequestStatus = async (
     id: string,
-    status: 'Approved' | 'Rejected'
+    status: 'Approved' | 'Rejected' | 'ChangeRequested' | 'Unlocked',
+    changeRequestReason?: string
   ) => {
     try {
-      const updated = await api.updateAvailabilityRequestStatus(id, status).catch(() => {
+      const updated = await api.updateAvailabilityRequestStatus(id, status, changeRequestReason).catch(() => {
         const req = availabilityRequests.find((r) => r.id === id)!;
-        return { ...req, status };
+        return { ...req, status, ...(changeRequestReason ? { changeRequestReason } : {}) };
       });
 
       setAvailabilityRequests(
@@ -337,9 +359,15 @@ export default function App() {
         }
       }
 
-      showToast(`Request ${status.toLowerCase()}.`);
+      if (status === 'Unlocked') {
+        showToast('Freigabe erteilt: Der Mitarbeiter kann nun eine neue Verfügbarkeit senden.');
+      } else if (status === 'ChangeRequested') {
+        showToast('Änderungsanfrage an den Manager gesendet.');
+      } else {
+        showToast(`Status auf ${status === 'Approved' ? 'Genehmigt' : 'Abgelehnt'} aktualisiert.`);
+      }
     } catch (err) {
-      showToast('Failed to update status', 'error');
+      showToast('Fehler beim Aktualisieren des Status', 'error');
     }
   };
 
@@ -556,6 +584,8 @@ export default function App() {
         {activeTab === 'employees' && (
           <EmployeeManagementView
             employees={employees}
+            restaurants={restaurants}
+            selectedRestaurantFilter={selectedRestaurantFilter}
             onAddEmployee={handleAddEmployee}
             onUpdateEmployee={handleUpdateEmployee}
             onDeleteEmployee={handleDeleteEmployee}
@@ -599,8 +629,10 @@ export default function App() {
         onDeleteShift={handleDeleteShift}
         initialShift={editingShift}
         employees={employees}
+        restaurants={restaurants}
         defaultDate={defaultShiftDate}
         defaultPosition={defaultShiftPosition}
+        defaultRestaurantId={defaultShiftRestaurantId}
       />
 
       <AutoSchedulerModal

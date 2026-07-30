@@ -32,30 +32,10 @@ interface DashboardViewProps {
   onOpenAddEmployee: () => void;
 }
 
-const POSITION_STYLES: Record<Position, { card: string; pill: string }> = {
+const POSITION_STYLES: Record<string, { card: string; pill: string }> = {
   Çalışan: {
     card: 'bg-blue-50/80 border-l-4 border-blue-500',
     pill: 'bg-blue-100 text-blue-800 border-blue-200',
-  },
-  Waiter: {
-    card: 'bg-blue-50/80 border-l-4 border-blue-500',
-    pill: 'bg-blue-100 text-blue-800 border-blue-200',
-  },
-  Chef: {
-    card: 'bg-orange-50/80 border-l-4 border-orange-500',
-    pill: 'bg-orange-100 text-orange-800 border-orange-200',
-  },
-  Cashier: {
-    card: 'bg-purple-50/80 border-l-4 border-purple-500',
-    pill: 'bg-purple-100 text-purple-800 border-purple-200',
-  },
-  Barista: {
-    card: 'bg-emerald-50/80 border-l-4 border-emerald-500',
-    pill: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  },
-  'Kitchen staff': {
-    card: 'bg-indigo-50/80 border-l-4 border-indigo-500',
-    pill: 'bg-indigo-100 text-indigo-800 border-indigo-200',
   },
 };
 
@@ -211,7 +191,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="space-y-2.5">
               {todaysShifts.map((shift) => {
                 const assignedEmp = employees.find((e) => e.id === shift.assignedEmployeeId);
-                const posStyle = POSITION_STYLES[shift.position] || POSITION_STYLES.Waiter;
+                const posStyle = POSITION_STYLES[shift.position] || POSITION_STYLES['Çalışan'];
 
                 if (!assignedEmp) {
                   return (
@@ -224,7 +204,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           Unbesetzte Schicht
                         </p>
                         <p className="font-semibold text-slate-800">
-                          {shift.position} erforderlich • {shift.startTime} - {shift.endTime}
+                          Schicht erforderlich • {shift.startTime} - {shift.endTime}
                         </p>
                       </div>
                       <button
@@ -249,14 +229,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <div>
                         <p className="font-bold text-slate-900 text-sm leading-snug">{assignedEmp.name}</p>
                         <p className="text-slate-500 text-[11px]">
-                          {shift.position} • {shift.startTime} - {shift.endTime}
+                          {shift.startTime} - {shift.endTime}
                         </p>
                       </div>
                     </div>
-
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${posStyle.pill}`}>
-                      {shift.position}
-                    </span>
                   </div>
                 );
               })}
@@ -299,7 +275,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-slate-900 leading-tight truncate">{emp.name}</p>
                       <p className="text-[10px] text-slate-500 uppercase font-medium truncate">
-                        {emp.position} • Max {emp.maxWeeklyHours} Std.
+                        Max {emp.maxWeeklyHours} Std.
                       </p>
                     </div>
                     <div

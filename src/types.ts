@@ -1,4 +1,4 @@
-export type Position = 'Çalışan' | 'Waiter' | 'Chef' | 'Cashier' | 'Barista' | 'Kitchen staff';
+export type Position = 'Çalışan';
 
 export type EmploymentType = 'Full-time' | 'Part-time';
 
@@ -71,7 +71,8 @@ export interface AvailabilityRequest {
   selectedWeek?: string; // e.g. '1. Hafta', '2. Hafta', '3. Hafta'
   dayAvailabilityTypes?: Partial<Record<DayOfWeek, 'Tam Gün' | 'Yarım Gün (Sabah)' | 'Yarım Gün (Akşam)' | 'İzinli'>>;
   reason?: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
+  changeRequestReason?: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'ChangeRequested' | 'Unlocked';
   createdAt: string;
 }
 

@@ -299,7 +299,7 @@ async function startServer() {
 
   app.put('/api/availability-requests/:id/status', (req, res) => {
     const { id } = req.params;
-    const { status } = req.body; // Approved or Rejected
+    const { status, changeRequestReason } = req.body;
     const index = availabilityRequestsStore.findIndex((r) => r.id === id);
 
     if (index === -1) {
@@ -307,6 +307,9 @@ async function startServer() {
     }
 
     availabilityRequestsStore[index].status = status;
+    if (changeRequestReason !== undefined) {
+      availabilityRequestsStore[index].changeRequestReason = changeRequestReason;
+    }
 
     // If approved, update employee record
     if (status === 'Approved') {
